@@ -612,7 +612,7 @@ export default function Landing() {
                 </button>
               </form>
               {source === "demo" && (
-                <p className="mt-2 text-[11px] text-neutral-500">Demo replies (no AI key set). Add ANTHROPIC_API_KEY for live in-character replies.</p>
+                <p className="mt-2 text-[11px] text-neutral-500">Demo mode: your therapist is running on scripted parody lines today.</p>
               )}
             </div>
 

@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Celebrity Persona Therapist",
-  description: "Vent to a parody celebrity therapist and get a shareable Session Prescription.",
+  description: "Vent to a parody celebrity therapist (Trump, Snoop Dogg, Amitabh Bachchan or Modi), hear in-character advice out loud, and unlock a shareable Session Prescription.",
 };
 
 export default function RootLayout({

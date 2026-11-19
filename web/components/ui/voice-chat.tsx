@@ -16,7 +16,7 @@ interface VoiceChatProps {
   /** Controlled mode: when set, the parent drives the state (real mic + voice). */
   status?: VoiceStatus;
   onToggle?: () => void;
-  /** Label under the mic, e.g. "Gordon Ramsay · parody therapist". */
+  /** Label under the mic, e.g. "Snoop Dogg · parody therapist". */
   assistantLabel?: string;
 }
 

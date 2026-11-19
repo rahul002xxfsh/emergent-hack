@@ -30,6 +30,12 @@ Every change Claude makes in this folder is recorded here, newest first.
 
 ## Change log
 
+### 2026-11-19 (copy cleanup to match the 4-therapist theme)
+- Website: replaced the developer-only "no AI key set" note with a friendly demo-mode line; the page description now names the 4 therapists; small comment fix in `voice-chat.tsx`.
+- `web/.env.example`: lists every optional key (Claude, Fish Audio, AnyToSpeech, Magic Hour) and the voice fallback order.
+- `README.md`: rewritten for 4 therapists (table with titles and styles), the voice setup, and the locked prescription.
+- One-pager (`ONE_PAGER.md`, `ONE_PAGER_FORM.html` → `ONE_PAGER.pdf`, `ONE_PAGER.docx`): persona names changed from the old 6 to Trump, Snoop Dogg, Amitabh Bachchan and Narendra Modi in the solution, UI, demo script, testing and open-question lines. Meaning is otherwise unchanged; the PDF is still 2 pages.
+
 ### 2026-11-19 (Narendra Modi added as a 4th therapist)
 - New persona "Narendra Modi", the "Pradhan Mantri of Peace of Mind" (Hinglish, mann-ki-baat style pep talks, yoga and sankalp jokes). It has strict no-politics limits and the same crisis rule. Added to `personas.json` (root + web/data), with a parody avatar `web/public/avatars/narendra-modi.svg` and a saffron accent colour.
 - Voice: Fish Audio library voice 03e67975… If Fish fails, it falls back to the browser voice (Magic Hour and AnyToSpeech have no Modi voice).

@@ -22,7 +22,7 @@ For each member: name, number, role, responsibilities, contact / GitHub, and wha
    - What they built: _ (fill after build)
 3. **Name:** Khanjan · **Number:** 26042
    - Role: Content + Persona writer
-   - Responsibilities: Writes and tunes the 6 persona prompts, greetings, catchphrases and prescription copy using Claude / ChatGPT
+   - Responsibilities: Writes and tunes the 4 persona prompts, greetings, catchphrases and prescription copy using Claude / ChatGPT
    - Contact / GitHub: _
    - What they built: _ (fill after build)
 4. **Name:** Madhur Rai · **Number:** 26047
@@ -66,7 +66,7 @@ For each member: name, number, role, responsibilities, contact / GitHub, and wha
 ## Idea Breakdown
 
 ### Product
-**What are we building (one sentence):** A voice-first web app where you pick a parody celebrity therapist (Dwight Schrute, Donald Trump, Gordon Ramsay, Sherlock Holmes, Miranda Priestly or Kanye West), vent about everyday stress out loud, hear funny in-character advice spoken back, and get a "Session Prescription" card to download and share.
+**What are we building (one sentence):** A voice-first web app where you pick a parody celebrity therapist (Donald Trump, Snoop Dogg, Amitabh Bachchan or Narendra Modi), vent about everyday stress out loud, hear funny in-character advice spoken back, and get a "Session Prescription" card to download and share.
 
 ### Problem
 **The problem (2–4 sentences: what hurts today, how often, what it costs):** Students and young professionals deal with small, daily stress (deadlines, exams, dating, procrastination) that is too minor for real therapy but too heavy to keep bottled up. Venting to friends wears thin, and generic AI chatbots answer in the same flat, polite voice, so venting feels like filling in a form. The result is unprocessed stress and no fun way to let it out.
@@ -80,7 +80,7 @@ For each member: name, number, role, responsibilities, contact / GitHub, and wha
 **Who benefits and how much:** The user gets a 2-minute laugh plus 3 small, concrete steps to act on; their friends get a funny card to share, which brings new users in.
 
 ### Your Solution
-**What it is (plain language):** You choose a celebrity parody therapist, talk (or type) about what's stressing you, and they answer in their voice and style: Gordon Ramsay calls your schedule "raw", Sherlock deduces the culprit is your phone. When you end the session you get a Session Prescription card with a diagnosis, a 3-step prescription and a signoff.
+**What it is (plain language):** You choose a celebrity parody therapist, talk (or type) about what's stressing you, and they answer in their voice and style: Trump calls your to-do list a bad deal to renegotiate, Snoop tells you to ride the deadline like a beat. When you end the session you get a Session Prescription card with a diagnosis, a 3-step prescription and a signoff.
 **How it solves the problem (each pain point → the feature that fixes it):**
 - Pain: venting to bots feels flat → Feature: 6 distinct personas with their own voice settings, catchphrases and comedic style
 - Pain: typing out feelings is effort → Feature: speak your rant; hear the reply read aloud
@@ -103,8 +103,8 @@ For each member: name, number, role, responsibilities, contact / GitHub, and wha
 
 **Demo script (3 minutes):**
 1. Show the problem (~20s): "It's 11 PM, three deadlines, and your friends have muted you." Ask the room who has procrastinated today.
-2. Walk the core flow, start to finish (~90s): pick Gordon Ramsay → greeting plays → vent out loud about procrastination → in-character voice reply → one follow-up → End Session.
-3. Show the "wow" moment (~30s): the Session Prescription card appears; download it; quickly switch to Sherlock with the same rant to show the persona difference.
+2. Walk the core flow, start to finish (~90s): pick Snoop Dogg → greeting plays → vent out loud about procrastination → in-character voice reply → one follow-up → End Session.
+3. Show the "wow" moment (~30s): the Session Prescription card appears; download it; quickly switch to Amitabh Bachchan with the same rant to show the persona difference.
 4. Impact and what's next (~20s): shareable card = free growth; next: more personas and challenge-a-friend links.
 
 **Live URL:** _ (after deploy) · **Test login (if any):** none (no login) · **Video (≤ 3 min):** _ (Emergent Video Agent)
@@ -115,7 +115,7 @@ For each member: name, number, role, responsibilities, contact / GitHub, and wha
 **Inspiration:** video-game "choose your fighter" screens + a cosy therapist's office + Spotify Wrapped-style share cards.
 **Style / look and feel:** mobile-first, playful and warm. Cream background, one bold accent colour per persona, rounded cards, a chunky friendly font, and illustrated caricature avatars (no real photos).
 **Screens needed:**
-1. **Pick your therapist**: 6 persona cards (avatar, funny title, style tag); tap to hear the greeting.
+1. **Pick your therapist**: 4 persona cards (avatar, funny title, style tag); tap to hear the greeting.
 2. **The Couch**: chat with a big pulsing mic button, persona-coloured bubbles, live captions and an animated "speaking" avatar.
 3. **Session Prescription**: a doctor's-slip card (diagnosis, 3-step Rx, signoff, "PARODY" stamp) with Download and Share buttons.
 **Always on:** "Parody · entertainment, not therapy" label; type option when the mic is off.
@@ -162,7 +162,7 @@ Pls go through the deck + resources and give a simplistic answer to this - avoid
 - **Frontend:** React web app (built by Emergent) — why: mobile-friendly UI, quick to build
 - **Backend:** Emergent-generated backend API — why: keeps the LLM key off the browser and holds the persona prompts
 - **Database:** Emergent's default database — why: store sessions and prescriptions for the share link; small and simple
-- **AI / ML:** One LLM with a persona system prompt — why: one model, 6 personalities, defined in `personas.json`
+- **AI / ML:** One LLM with a persona system prompt — why: one model, 4 personalities, defined in `personas.json`
 - **Hosting / deployment:** Emergent deploy — why: one click, no setup
 - **APIs / services:** Web Speech API (SpeechRecognition + speechSynthesis) — why: free, runs in the browser, no extra keys
 
@@ -199,7 +199,7 @@ couch-parody/
 - Environment variables: `LLM_API_KEY` — LLM access ; `DATABASE_URL` — sessions store
 - Run command: `run / preview in Emergent` (runs at the Emergent preview URL)
 
-**Testing:** how to run: click through the full demo flow on the deployed app on the presentation phone/laptop ; what is tested: all 6 personas reply in character, mic works, card generates every time ; manual test cases (scenario → expected result): rant about exams with Gordon → kitchen-metaphor reply + card ; type a self-harm message → comedy stops and helpline shows ; deny mic permission → typing still works.
+**Testing:** how to run: click through the full demo flow on the deployed app on the presentation phone/laptop ; what is tested: all 4 personas reply in character, mic works, card generates every time ; manual test cases (scenario → expected result): rant about exams with Trump → "rigged game you'll win bigly" reply + card ; type a self-harm message → comedy stops and helpline shows ; deny mic permission → typing still works.
 
 **Deployment:** where it is hosted: Emergent ; how to redeploy: Emergent deploy button after a tested checkpoint.
 
@@ -220,5 +220,5 @@ couch-parody/
 ## Questions? Put them down below (pls ask specific well researched questions)
 
 1. Does Emergent's built-in LLM integration use our 800–1,000 credits per chat call, and roughly how many credits does one chat turn cost, so we can budget for demo and testing?
-2. Are parody personas of real living people (Donald Trump, Kanye West) acceptable for judging and for the mandatory LinkedIn / X posts, or should we swap them for fictional characters?
+2. Are parody personas of real living people (Donald Trump, Snoop Dogg, Amitabh Bachchan, Narendra Modi) acceptable for judging and for the mandatory LinkedIn / X posts, or should we swap them for fictional characters?
 3. Does the Emergent Video Agent work from our deployed app URL, or do we need to supply screen recordings for the video?
