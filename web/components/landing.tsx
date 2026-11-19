@@ -133,16 +133,27 @@ export default function Landing() {
     logRef.current?.scrollTo({ top: logRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, interim]);
 
+  // Real celebrity-style voice (Magic Hour), generated only when a reply arrives. Falls back to the browser voice.
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const speakIdRef = useRef(0);
+  const voiceCacheRef = useRef(new Map<string, string>());
+  const stopVoice = useCallback(() => {
+    speakIdRef.current++;
+    audioRef.current?.pause();
+    audioRef.current = null;
+    window.speechSynthesis?.cancel();
+  }, []);
+
   // New persona or topic = new session
   const resetSession = useCallback(() => {
-    window.speechSynthesis?.cancel();
+    stopVoice();
     recognitionRef.current?.stop();
     setMessages([]);
     setPrescription(null);
     setStatus("idle");
     setNotice(null);
     setSource(null);
-  }, []);
+  }, [stopVoice]);
 
   useEffect(() => {
     resetSession();
@@ -155,25 +166,26 @@ export default function Landing() {
       const src = clipSrc || (Array.isArray(clips) && clips.length > 0 ? clips[0]?.src : null);
       if (!src) return;
       try {
-        window.speechSynthesis?.cancel();
+        stopVoice();
+        const id = speakIdRef.current;
         const audio = new Audio(src);
+        audioRef.current = audio;
         setStatus("speaking");
-        audio.onended = () => setStatus("idle");
-        audio.onerror = () => setStatus("idle");
-        audio.play().catch(() => setStatus("idle"));
+        audio.onended = () => id === speakIdRef.current && setStatus("idle");
+        audio.onerror = () => id === speakIdRef.current && setStatus("idle");
+        audio.play().catch(() => id === speakIdRef.current && setStatus("idle"));
       } catch {
         setStatus("idle");
       }
     },
-    [persona]
+    [persona, stopVoice]
   );
 
-  const speak = useCallback(
-    (text: string) => {
-      if (typeof window === "undefined") return;
-      const synth = window.speechSynthesis;
-      if (!synth) {
-        setStatus("idle");
+  const browserSpeak = useCallback(
+    (text: string, id: number) => {
+      const synth = typeof window !== "undefined" ? window.speechSynthesis : undefined;
+      if (!synth || id !== speakIdRef.current) {
+        if (id === speakIdRef.current) setStatus("idle");
         return;
       }
       try {
@@ -185,7 +197,6 @@ export default function Landing() {
         }
         const voices = Array.isArray(synth.getVoices?.()) ? synth.getVoices() : [];
         const wanted = britishVoices.has(persona?.id ?? "") ? "en-GB" : "en-US";
-        
         // Prioritize modern natural / neural / google voices safely
         const natural = voices.find(
           (v) =>
@@ -196,9 +207,8 @@ export default function Landing() {
             (v.name.includes("Natural") || v.name.includes("Neural") || v.name.includes("Google") || v.name.includes("Online"))
         );
         u.voice = natural ?? voices.find((v) => v?.lang === wanted) ?? voices.find((v) => v?.lang?.startsWith?.("en")) ?? null;
-
-        u.onend = () => setStatus("idle");
-        u.onerror = () => setStatus("idle");
+        u.onend = () => id === speakIdRef.current && setStatus("idle");
+        u.onerror = () => id === speakIdRef.current && setStatus("idle");
         setStatus("speaking");
         synth.speak(u);
       } catch {
@@ -206,6 +216,41 @@ export default function Landing() {
       }
     },
     [persona]
+  );
+
+  const speak = useCallback(
+    async (text: string) => {
+      stopVoice();
+      const id = speakIdRef.current;
+      const cacheKey = `${persona.id}|${text}`;
+      setStatus("processing");
+      let url = voiceCacheRef.current.get(cacheKey);
+      if (!url) {
+        try {
+          const res = await fetch("/api/voice", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ personaId: persona.id, text }),
+          });
+          const data = (await res.json()) as { url?: string };
+          if (data.url) {
+            url = data.url;
+            voiceCacheRef.current.set(cacheKey, url);
+          }
+        } catch {
+          /* fall through to browser voice */
+        }
+      }
+      if (id !== speakIdRef.current) return; // user moved on
+      if (!url) return browserSpeak(text, id);
+      const audio = new Audio(url);
+      audioRef.current = audio;
+      audio.onended = () => id === speakIdRef.current && setStatus("idle");
+      audio.onerror = () => id === speakIdRef.current && browserSpeak(text, id);
+      setStatus("speaking");
+      audio.play().catch(() => id === speakIdRef.current && browserSpeak(text, id));
+    },
+    [persona.id, stopVoice, browserSpeak]
   );
 
   const send = useCallback(
@@ -242,7 +287,7 @@ export default function Landing() {
 
   const toggleMic = useCallback(() => {
     if (status === "speaking") {
-      window.speechSynthesis?.cancel();
+      stopVoice();
       setStatus("idle");
       return;
     }
@@ -285,13 +330,13 @@ export default function Landing() {
       else setStatus("idle");
     };
     recognitionRef.current = rec;
-    window.speechSynthesis?.cancel();
+    stopVoice();
     setStatus("listening");
     rec.start();
-  }, [status, send]);
+  }, [status, send, stopVoice]);
 
   const endSession = useCallback(async () => {
-    window.speechSynthesis?.cancel();
+    stopVoice();
     setStatus("idle");
     setRxLoading(true);
     try {
@@ -306,7 +351,7 @@ export default function Landing() {
     } finally {
       setRxLoading(false);
     }
-  }, [persona.id, category, stress]);
+  }, [persona.id, category, stress, stopVoice]);
 
   const flashRx = useCallback((msg: string) => {
     setRxNotice(msg);
