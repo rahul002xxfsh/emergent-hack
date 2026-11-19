@@ -30,6 +30,11 @@ Every change Claude makes in this folder is recorded here, newest first.
 
 ## Change log
 
+### 2026-11-19 (AnyToSpeech for the Trump voice)
+- `web/app/api/voice/route.ts`: Trump replies now use AnyToSpeech (MCP over HTTP, `speech_synthesize` with `famous_slug: donald-trump`). It is synchronous and returns an MP3 in about 2 s, versus about 4 s on Magic Hour. If AnyToSpeech fails, Magic Hour is the backup, then the browser voice.
+- AnyToSpeech has no Snoop Dogg or Amitabh Bachchan voice, so those two stay on Magic Hour.
+- Key `ANYTOSPEECH_API_KEY` is in `web/.env.local` (gitignored) and Vercel env (Production + Preview). Free plan: 5,000 characters of credit.
+
 ### 2026-11-19 (prescription locked until the session ends)
 - `web/components/landing.tsx`: the Session Prescription card is blurred with a lock overlay ("Finish your session to unlock" + "Go to session" button) until the user hits End session. While it is being written, the overlay shows a spinner. Download and Share stay disabled until it unlocks. Verified locally: blurred before, clear after End session.
 
