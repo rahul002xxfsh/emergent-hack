@@ -2,12 +2,14 @@
 
 import { useEffect, useRef, memo } from "react";
 import * as THREE from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { type VoiceStatus } from "@/components/ui/voice-chat";
 
 interface Therapist3DProps {
   status?: VoiceStatus;
   accentColor?: string;
   personaName?: string;
+  modelUrl?: string;
   className?: string;
 }
 
@@ -24,6 +26,7 @@ export const Therapist3D = memo(function Therapist3D({
   status = "idle",
   accentColor = "#F59E0B",
   personaName = "Dr. Therapist",
+  modelUrl,
   className = "",
 }: Therapist3DProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -85,6 +88,46 @@ export const Therapist3D = memo(function Therapist3D({
     const characterGroup = new THREE.Group();
     scene.add(characterGroup);
     characterGroup.position.set(0, -0.65, 0);
+
+    let customHeadBone: THREE.Object3D | null = null;
+    let customModelGroup: THREE.Group | null = null;
+
+    if (modelUrl) {
+      const loader = new GLTFLoader();
+      loader.load(
+        modelUrl,
+        (gltf) => {
+          customModelGroup = gltf.scene;
+          characterGroup.visible = false; // Hide procedural when external GLTF is active
+          scene.add(customModelGroup);
+
+          const box = new THREE.Box3().setFromObject(customModelGroup);
+          const size = new THREE.Vector3();
+          box.getSize(size);
+          const maxDim = Math.max(size.x, size.y, size.z);
+          const scale = 2.4 / (maxDim || 1);
+          customModelGroup.scale.setScalar(scale);
+
+          const center = new THREE.Vector3();
+          box.getCenter(center);
+          customModelGroup.position.set(-center.x * scale, -center.y * scale - 0.2, -center.z * scale);
+
+          customModelGroup.traverse((child) => {
+            if (/head|neck/i.test(child.name) && !customHeadBone) {
+              customHeadBone = child;
+            }
+            if (child instanceof THREE.Mesh) {
+              child.castShadow = true;
+              child.receiveShadow = true;
+            }
+          });
+        },
+        undefined,
+        () => {
+          characterGroup.visible = true; // Fallback to procedural model if GLTF is missing
+        }
+      );
+    }
 
     // 1. Leather Executive Armchair
     const chairGroup = new THREE.Group();
@@ -422,6 +465,14 @@ export const Therapist3D = memo(function Therapist3D({
       headGroup.rotation.y = targetHeadYaw;
       headGroup.rotation.x = targetHeadPitch;
       headGroup.rotation.z = targetHeadRoll;
+
+      if (customHeadBone) {
+        (customHeadBone as THREE.Object3D).rotation.y = targetHeadYaw;
+        (customHeadBone as THREE.Object3D).rotation.x = targetHeadPitch;
+      } else if (customModelGroup) {
+        (customModelGroup as THREE.Group).rotation.y = targetHeadYaw * 0.5;
+        (customModelGroup as THREE.Group).rotation.x = targetHeadPitch * 0.3;
+      }
 
       // 2. EYE TRACKING (Pupils dart slightly faster to catch attention)
       const targetEyeX = mouse.x * 0.02;

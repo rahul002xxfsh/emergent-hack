@@ -590,6 +590,7 @@ export default function Landing() {
                   status={status}
                   accentColor={color.accent}
                   personaName={persona.name}
+                  modelUrl="/models/therapist.glb"
                   className="h-full w-full"
                 />
               ) : (
