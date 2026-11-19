@@ -21,6 +21,7 @@ export type CategoryId = (typeof categories)[number]["id"];
 export const personaColors: Record<string, { accent: string; soft: string; text: string }> = {
   "snoop-dogg": { accent: "#22C55E", soft: "rgba(34,197,94,0.15)", text: "#86EFAC" },
   "amitabh-bachchan": { accent: "#F97316", soft: "rgba(249,115,22,0.15)", text: "#FDBA74" },
+  "narendra-modi": { accent: "#EAB308", soft: "rgba(234,179,8,0.15)", text: "#FDE047" },
   "donald-trump": { accent: "#3B82F6", soft: "rgba(59,130,246,0.15)", text: "#93C5FD" },
 };
 

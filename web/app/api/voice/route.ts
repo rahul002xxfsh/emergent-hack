@@ -15,6 +15,7 @@ const FISH_VOICES: Record<string, string> = {
   trump: "010da99c66f44d319159c8588315f22c",
   snoop: "36383de9db3944e99f6063ee16ee4b58",
   amitabh: "ea7cdc74aeae4b608be27fdc37fdcb05",
+  modi: "03e679752fa54b778a189c9f4e9d1889",
 };
 
 async function fishAudio(referenceId: string, text: string): Promise<string | null> {
@@ -72,7 +73,8 @@ export async function POST(req: Request) {
   const { personaId, text } = (await req.json().catch(() => ({}))) as { personaId?: string; text?: string };
   const cfg = Object.entries(VOICES).find(([k]) => personaId?.includes(k))?.[1];
   const prompt = (text ?? "").trim();
-  if (!cfg || !prompt) return NextResponse.json({ error: "bad_request" }, { status: 400 });
+  const known = [VOICES, FISH_VOICES, ATS_VOICES].some((m) => Object.keys(m).some((k) => personaId?.includes(k)));
+  if (!known || !prompt) return NextResponse.json({ error: "bad_request" }, { status: 400 });
   if (prompt.length > MAX_CHARS) return NextResponse.json({ error: "too_long" }, { status: 413 });
 
   const fishId = Object.entries(FISH_VOICES).find(([k]) => personaId?.includes(k))?.[1];
@@ -88,7 +90,7 @@ export async function POST(req: Request) {
   }
 
   const key = process.env.MAGIC_HOUR_API_KEY;
-  if (!key) return NextResponse.json({ error: "no_key" }, { status: 503 });
+  if (!key || !cfg) return NextResponse.json({ error: "no_voice" }, { status: 503 });
 
   const headers = { authorization: `Bearer ${key}`, "content-type": "application/json", accept: "application/json" };
   try {

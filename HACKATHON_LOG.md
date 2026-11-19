@@ -30,6 +30,11 @@ Every change Claude makes in this folder is recorded here, newest first.
 
 ## Change log
 
+### 2026-11-19 (Narendra Modi added as a 4th therapist)
+- New persona "Narendra Modi", the "Pradhan Mantri of Peace of Mind" (Hinglish, mann-ki-baat style pep talks, yoga and sankalp jokes). It has strict no-politics limits and the same crisis rule. Added to `personas.json` (root + web/data), with a parody avatar `web/public/avatars/narendra-modi.svg` and a saffron accent colour.
+- Voice: Fish Audio library voice 03e67975… If Fish fails, it falls back to the browser voice (Magic Hour and AnyToSpeech have no Modi voice).
+- Fixed the voice route so a persona without a Magic Hour backup is no longer rejected. Copy changed to "Four parody personas".
+
 ### 2026-11-19 (Fish Audio as the main voice)
 - `web/app/api/voice/route.ts`: all three therapists now speak with Fish Audio library voices (REST `POST /v1/tts`, free model `s2.1-pro-free`, MP3 returned to the browser as a data URL, about 1–2 s). Voice IDs: Trump 010da99c…, Snoop Dogg 36383de9…, Amitabh Bachchan ea7cdc74… (most-used Fish library voices). Done the Next.js way instead of the Python SDK from the plan; same API.
 - Fallback order: Fish → AnyToSpeech (Trump only) → Magic Hour → browser voice.
