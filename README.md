@@ -30,6 +30,22 @@ All four stay strictly off politics, religion and real-world claims, and drop th
 - Live stress meter (0-100) from stress words
 - Session Prescription stays blurred until you end the session, then download it as a PNG or share it
 
+## Therapy-only boundary
+The chatbot only talks about the user's own stress, feelings and everyday struggles. Anything else gets one fixed reply:
+> "This is not something we are here to discuss. Is there anything that I can help you with related to your therapy?"
+
+It works in three layers:
+1. **Rules before any AI call** (`web/lib/boundary.ts`): catch jailbreak attempts, politics, news, gossip, movie and music trivia, coding, maths, homework and writing, general knowledge, shopping, recipes, and medical or legal advice. Crisis messages are checked first and always get the helpline reply (Tele-MANAS 14416, 112).
+2. **AI instructions** (`buildSystemPrompt` in `web/lib/therapy.ts`): the strict domain boundary plus worked examples for the subtle cases.
+3. **Safety net**: if the AI uses the off-topic sentence, only that sentence is sent.
+
+**Edge-case dataset:** `web/data/boundary-dataset.json` has 198 labelled messages (therapy / off_topic / crisis), including tricky venting such as "my code keeps failing and my manager is angry", Hinglish, and 60 messages added after the rules were written. Run it against a local server:
+```bash
+cd web && npm run build && npx next start -p 3100
+node scripts/eval-boundary.mjs
+```
+Current result: 198/198. On a fresh batch the rules had never seen, the first score was 27/30, so expect about 90% on brand-new phrasings. Add every miss to the dataset.
+
 ## Run locally
 ```bash
 cd web

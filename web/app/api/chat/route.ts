@@ -5,6 +5,7 @@ import {
 } from "@/lib/therapy";
 import { getClient, hasClaude, MODEL, describeError } from "@/lib/claude";
 import { rateLimit, parseBody, ChatBody } from "@/lib/guard";
+import { checkBoundary, OFF_TOPIC_REPLY } from "@/lib/boundary";
 
 export async function POST(req: Request) {
   const limited = rateLimit(req, "chat", 20);
@@ -22,6 +23,10 @@ export async function POST(req: Request) {
   const userTurns = messages.filter((m) => m.role === "user").length;
   const check = precheck(last.content, userTurns);
   if (!check.ok) return NextResponse.json({ reply: check.reply, code: check.code, source: "rules" });
+
+  // Therapy-only boundary: clear off-topic or jailbreak messages get the fixed reply, no AI call
+  const hit = checkBoundary(last.content);
+  if (hit) return NextResponse.json({ reply: OFF_TOPIC_REPLY, code: "off_topic", source: "rules" });
 
   if (!hasClaude()) {
     return NextResponse.json({ reply: offlineReply(persona, body.category, last.content, userTurns - 1), source: "demo" });
@@ -41,6 +46,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ reply: "Let's keep this about how you're feeling. What's stressing you out right now?", source: "refusal" });
     }
     const text = response.content.flatMap((b) => (b.type === "text" ? [b.text] : [])).join(" ").trim();
+    // Safety net: if the model used the off-topic sentence, send only that sentence
+    if (text.includes("not something we are here to discuss")) {
+      return NextResponse.json({ reply: OFF_TOPIC_REPLY, code: "off_topic", source: "claude" });
+    }
     return NextResponse.json({ reply: clampWords(text || "Tell me more.", MAX_REPLY_WORDS), source: "claude" });
   } catch (error) {
     console.error("chat error", describeError(error));

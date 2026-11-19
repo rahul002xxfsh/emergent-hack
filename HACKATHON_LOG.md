@@ -30,6 +30,13 @@ Every change Claude makes in this folder is recorded here, newest first.
 
 ## Change log
 
+### 2026-11-19 (therapy-only boundary + edge-case dataset; captions only in voice chat)
+- Live captions now show only for voice chat replies (removed from the "Now on the couch" greeting).
+- New `web/lib/boundary.ts`: a rule filter that runs before the AI (and in demo mode). Off-topic requests and jailbreak attempts get exactly "This is not something we are here to discuss. Is there anything that I can help you with related to your therapy?". Covers politics/elections, news, celebrity gossip, movies/music trivia, coding, maths, homework/essay writing, general knowledge, shopping, recipes, medical/medication and legal advice, and "ignore your instructions" tricks. Venting that mentions these topics (e.g. "my code keeps failing and my boss is angry", "office politics is killing me") still gets a therapy reply.
+- AI prompt: the team's STRICT DOMAIN BOUNDARY text added verbatim (with the crisis exception) plus worked examples; the reply is forced to the exact sentence if the model uses it.
+- Crisis detection broadened (ending it all, better off dead, overdose, jumping off a building, "want everything to stop", someone hurting/beating me, Hindi phrases). Crisis always wins over the off-topic rule.
+- New dataset `web/data/boundary-dataset.json` (198 labelled cases) and test runner `web/scripts/eval-boundary.mjs`. Result 198/198. Honest generalisation check: a fresh unseen batch scored 27/30 before fixes, so expect about 90% on brand-new phrasings.
+
 ### 2026-11-19 (real-time captions while a therapist speaks)
 - New `web/components/ui/live-caption.tsx`: a subtitle bar fixed at the bottom of the screen that shows the therapist's words as they are spoken (newest word highlighted in the persona colour, about 2 lines visible, fades out 1.6 s after speech ends).
 - Sync: Fish audio follows the clip's playback position (`currentTime / duration`, word by word); the browser-voice fallback uses the browser's word-boundary events, with a timing estimate if those aren't sent. A tiny external store means only the caption bar re-renders during playback.

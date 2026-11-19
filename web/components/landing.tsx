@@ -316,10 +316,8 @@ export default function Landing() {
       }
     }
     if (id !== speakIdRef.current) return;
-    const accent = personaColors[persona.id]?.accent ?? "#fff";
     const done = () => {
       if (id !== speakIdRef.current) return;
-      caption.finish();
       setGreet("idle");
     };
     if (!url) {
@@ -330,9 +328,7 @@ export default function Landing() {
       u.rate = persona.voice_config?.rate ?? 1;
       u.onend = done;
       u.onerror = done;
-      u.onboundary = (e) => id === speakIdRef.current && caption.boundary(e.charIndex, e.charLength);
       setGreet("playing");
-      caption.followSpeech(text, persona.name, accent, u.rate);
       synth.speak(u);
       return;
     }
@@ -343,7 +339,6 @@ export default function Landing() {
     audio.onended = done;
     audio.onerror = done;
     setGreet("playing");
-    caption.followAudio(text, persona.name, accent, audio);
     audio.play().catch(done);
   }, [greet, persona, stopVoice, unlockAudio]);
 
