@@ -19,12 +19,9 @@ export const categories = [
 export type CategoryId = (typeof categories)[number]["id"];
 
 export const personaColors: Record<string, { accent: string; soft: string; text: string }> = {
-  "dwight-schrute": { accent: "#F59E0B", soft: "rgba(245,158,11,0.15)", text: "#FCD34D" },
+  "snoop-dogg": { accent: "#22C55E", soft: "rgba(34,197,94,0.15)", text: "#86EFAC" },
+  "amitabh-bachchan": { accent: "#F97316", soft: "rgba(249,115,22,0.15)", text: "#FDBA74" },
   "donald-trump": { accent: "#3B82F6", soft: "rgba(59,130,246,0.15)", text: "#93C5FD" },
-  "gordon-ramsay": { accent: "#EF4444", soft: "rgba(239,68,68,0.15)", text: "#FCA5A5" },
-  "sherlock-holmes": { accent: "#14B8A6", soft: "rgba(20,184,166,0.15)", text: "#5EEAD4" },
-  "miranda-priestly": { accent: "#EC4899", soft: "rgba(236,72,153,0.15)", text: "#F9A8D4" },
-  "kanye-west": { accent: "#8B5CF6", soft: "rgba(139,92,246,0.15)", text: "#C4B5FD" },
 };
 
 export function countWords(text: string): number {

@@ -32,7 +32,7 @@ type SpeechRecognitionLike = {
   onerror: ((e: { error: string }) => void) | null;
 };
 
-const britishVoices = new Set(["gordon-ramsay", "sherlock-holmes", "miranda-priestly"]);
+const britishVoices = new Set<string>([]);
 
 const personaCards = personas.map((p) => ({
   quote: `“${p.greeting}”`,
@@ -55,7 +55,7 @@ function scrollToId(id: string) {
 export default function Landing() {
   const [personaIndex, setPersonaIndex] = useState(0);
   const persona = personas[personaIndex] ?? personas[0];
-  const color = (persona?.id && personaColors[persona.id]) ? personaColors[persona.id] : personaColors["dwight-schrute"];
+  const color = (persona?.id && personaColors[persona.id]) ? personaColors[persona.id] : personaColors["donald-trump"];
   const [category, setCategory] = useState<CategoryId>("exams");
   const [stageMode, setStageMode] = useState<"therapist" | "robot">("therapist");
   const [activeSection, setActiveSection] = useState("Home");
@@ -417,7 +417,7 @@ export default function Landing() {
         <div className="mx-auto max-w-5xl text-center">
           <p className="text-sm uppercase tracking-[0.3em] text-amber-300/80">Step 1</p>
           <h2 className="mt-3 text-4xl font-bold md:text-6xl">Pick your therapist</h2>
-          <p className="mx-auto mt-4 max-w-xl text-neutral-400">Six parody personas. Each one has its own voice, style and very questionable bedside manner.</p>
+          <p className="mx-auto mt-4 max-w-xl text-neutral-400">Three parody personas. Each one has its own voice, style and very questionable bedside manner.</p>
         </div>
 
         <div className="mx-auto mt-10 flex max-w-5xl justify-center rounded-3xl border border-white/10 bg-[#0b0b0f] p-4 md:p-10">

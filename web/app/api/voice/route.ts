@@ -6,11 +6,8 @@ const MAX_CHARS = 1200; // 0.1 credit per character, so cap spend per reply
 
 const VOICES: Record<string, { voice: string; speed: number }> = {
   trump: { voice: "Donald Trump", speed: 1 },
-  ramsay: { voice: "Gordon Ramsay", speed: 1.1 },
-  kanye: { voice: "Kanye West", speed: 1.05 },
-  dwight: { voice: "cv-0309", speed: 1.1 },
-  sherlock: { voice: "cv-0347", speed: 1.12 },
-  miranda: { voice: "cv-0472", speed: 0.95 },
+  snoop: { voice: "Snoop Dogg", speed: 0.95 },
+  amitabh: { voice: "Amitabh Bachchan", speed: 0.95 },
 };
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
