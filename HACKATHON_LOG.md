@@ -30,6 +30,12 @@ Every change Claude makes in this folder is recorded here, newest first.
 
 ## Change log
 
+### 2026-11-19 (Magic Hour celebrity voices on replies)
+- New server route `web/app/api/voice/route.ts`: when a therapist reply arrives, it asks the Magic Hour AI voice generator for audio in that persona's voice (Donald Trump, Gordon Ramsay and Kanye West use Magic Hour's named voices; Dwight, Sherlock and Miranda use stock voices cv-0309, cv-0347 and cv-0472), waits for it (about 3–4 s), and returns the clip URL.
+- `web/components/landing.tsx`: replies now play this generated voice; if it fails or credits run out, the browser voice takes over. Audio is cached per reply, and skip, new persona and end session all stop it. Merged with the teammates' 3D therapist and audio-clip work.
+- Key `MAGIC_HOUR_API_KEY` kept in `web/.env.local` (gitignored) and in Vercel env (Production + Preview). It is never committed.
+- Cost: 0.1 credit per character, so about 9–30 credits per reply. The account is on the free tier (367 credits left after testing, roughly 12–20 more replies).
+
 ### 2026-11-19 (feat: 3D interactive therapist character with mouse tracking)
 - Implemented real-time interactive 3D Therapist component in `web/components/ui/therapist-3d.tsx` using Three.js:
   - Stylized 3D Doctor/Therapist character seated in an executive leather armchair, complete with doctor's coat, shirt, tie, stethoscope, spectacles/glasses, and sculpted hair.
