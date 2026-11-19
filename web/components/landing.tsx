@@ -7,7 +7,7 @@ import { Download, Share2, RotateCcw, Send, Stethoscope, Keyboard, ShieldAlert, 
 import { cn } from "@/lib/utils";
 import { AnimeNavBar } from "@/components/ui/anime-navbar";
 import { scrollToSection } from "@/lib/scroll";
-import MetroHero from "@/components/ui/scroll-locked-video-hero";
+import MetroHero, { CouchPanel } from "@/components/ui/scroll-locked-video-hero";
 import { CircularTestimonials } from "@/components/ui/circular-testimonials";
 import { SplineScene } from "@/components/ui/splite";
 import { Therapist3D } from "@/components/ui/therapist-3d";
@@ -149,8 +149,10 @@ export default function Landing() {
     a.src = SILENT_WAV;
     a.play().then(() => { a.dataset.unlocked = "1"; }).catch(() => {});
   }, []);
+  const [greet, setGreet] = useState<"idle" | "loading" | "playing">("idle");
   const stopVoice = useCallback(() => {
     speakIdRef.current++;
+    setGreet("idle");
     audioRef.current?.pause();
     audioRef.current = null;
     window.speechSynthesis?.cancel();
@@ -266,6 +268,59 @@ export default function Landing() {
     },
     [persona.id, stopVoice, browserSpeak]
   );
+
+  // Hero "Now on the couch" mic: speak the selected therapist's greeting in their Fish voice.
+  const playGreeting = useCallback(async () => {
+    if (greet !== "idle") {
+      stopVoice();
+      return;
+    }
+    unlockAudio();
+    stopVoice();
+    const id = speakIdRef.current;
+    const text = persona.greeting;
+    const cacheKey = `${persona.id}|${text}`;
+    setGreet("loading");
+    let url = voiceCacheRef.current.get(cacheKey);
+    if (!url) {
+      try {
+        const res = await fetch("/api/voice", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ personaId: persona.id, text }),
+        });
+        const data = (await res.json()) as { url?: string };
+        if (data.url) {
+          url = data.url;
+          voiceCacheRef.current.set(cacheKey, url);
+        }
+      } catch {
+        /* fall back below */
+      }
+    }
+    if (id !== speakIdRef.current) return;
+    const done = () => id === speakIdRef.current && setGreet("idle");
+    if (!url) {
+      const synth = window.speechSynthesis;
+      if (!synth) return done();
+      const u = new SpeechSynthesisUtterance(text);
+      u.pitch = persona.voice_config?.pitch ?? 1;
+      u.rate = persona.voice_config?.rate ?? 1;
+      u.onend = done;
+      u.onerror = done;
+      setGreet("playing");
+      synth.speak(u);
+      return;
+    }
+    const audio = playerRef.current ?? new Audio();
+    audio.pause();
+    audio.src = url;
+    audioRef.current = audio;
+    audio.onended = done;
+    audio.onerror = done;
+    setGreet("playing");
+    audio.play().catch(done);
+  }, [greet, persona, stopVoice, unlockAudio]);
 
   const send = useCallback(
     async (text: string) => {
@@ -425,61 +480,67 @@ export default function Landing() {
         }}
       />
 
-      {/* 1. Scroll-locked hero */}
+      {/* 1. Intro */}
       <MetroHero onStart={() => scrollToId("personas")} />
 
-      {/* 3. Pick your therapist */}
-      <section id="personas" className="relative scroll-mt-24 overflow-hidden px-4 py-24">
+      {/* 2. Now on the couch + Pick your therapist, side by side */}
+      <section id="personas" className="relative scroll-mt-24 overflow-x-clip px-4 py-24">
         <div className="mx-auto max-w-5xl text-center">
           <p className="text-sm uppercase tracking-[0.3em] text-amber-300/80">Step 1</p>
           <h2 className="mt-3 text-4xl font-bold md:text-6xl">Pick your therapist</h2>
-          <p className="mx-auto mt-4 max-w-xl text-neutral-400">Four parody personas. Each one has its own voice, style and very questionable bedside manner.</p>
+          <p className="mx-auto mt-4 max-w-xl text-neutral-400">Four parody personas. Each one has its own voice, style and very questionable bedside manner. Tap the mic to hear them.</p>
         </div>
 
-        <div className="mx-auto mt-10 flex max-w-5xl justify-center rounded-3xl border border-white/10 bg-[#0b0b0f] p-4 md:p-10">
-          <CircularTestimonials
-            testimonials={personaCards}
-            autoplay={false}
-            onChange={setPersonaIndex}
-            colors={{
-              name: "#f7f7ff",
-              designation: color.text,
-              testimony: "#e5e5ea",
-              arrowBackground: color.accent,
-              arrowForeground: "#0a0a0a",
-              arrowHoverBackground: "#f7f7ff",
-            }}
-            fontSizes={{ name: "30px", designation: "16px", quote: "20px" }}
-            footer={
-              <div>
-                <p className="mb-3 text-xs uppercase tracking-[0.25em] text-neutral-500">Step 2 · What&apos;s stressing you?</p>
-                <div className="flex flex-wrap gap-2">
-                  {categories.map((c) => (
+        <div className="mx-auto mt-10 grid max-w-7xl gap-6 lg:grid-cols-2 lg:items-start">
+          <div className="lg:sticky lg:top-28">
+            <CouchPanel persona={persona} greet={greet} onMic={playGreeting} />
+          </div>
+          <div className="flex justify-center rounded-3xl border border-white/10 bg-[#0b0b0f] p-4 md:p-8">
+              <CircularTestimonials
+                stacked
+                testimonials={personaCards}
+                autoplay={false}
+                onChange={setPersonaIndex}
+                colors={{
+                  name: "#f7f7ff",
+                  designation: color.text,
+                  testimony: "#e5e5ea",
+                  arrowBackground: color.accent,
+                  arrowForeground: "#0a0a0a",
+                  arrowHoverBackground: "#f7f7ff",
+                }}
+                fontSizes={{ name: "30px", designation: "16px", quote: "20px" }}
+                footer={
+                  <div>
+                    <p className="mb-3 text-xs uppercase tracking-[0.25em] text-neutral-500">Step 2 · What&apos;s stressing you?</p>
+                    <div className="flex flex-wrap gap-2">
+                      {categories.map((c) => (
+                        <button
+                          key={c.id}
+                          onClick={() => setCategory(c.id)}
+                          title={c.hint}
+                          className="rounded-full border px-3 py-1.5 text-sm transition duration-150 active:scale-95"
+                          style={
+                            category === c.id
+                              ? { background: color.accent, borderColor: color.accent, color: "#0a0a0a" }
+                              : { borderColor: "rgba(255,255,255,0.15)", color: "#d4d4d8" }
+                          }
+                        >
+                          {c.label}
+                        </button>
+                      ))}
+                    </div>
                     <button
-                      key={c.id}
-                      onClick={() => setCategory(c.id)}
-                      title={c.hint}
-                      className="rounded-full border px-3 py-1.5 text-sm transition duration-150 active:scale-95"
-                      style={
-                        category === c.id
-                          ? { background: color.accent, borderColor: color.accent, color: "#0a0a0a" }
-                          : { borderColor: "rgba(255,255,255,0.15)", color: "#d4d4d8" }
-                      }
+                      onClick={() => scrollToId("session")}
+                      className="mt-6 rounded-full px-6 py-3 text-sm font-semibold text-black transition-transform duration-150 hover:scale-105 active:scale-95"
+                      style={{ background: color.accent }}
                     >
-                      {c.label}
+                      Start session with {persona.name.split(" ")[0]}
                     </button>
-                  ))}
-                </div>
-                <button
-                  onClick={() => scrollToId("session")}
-                  className="mt-6 rounded-full px-6 py-3 text-sm font-semibold text-black transition-transform duration-150 hover:scale-105 active:scale-95"
-                  style={{ background: color.accent }}
-                >
-                  Start session with {persona.name.split(" ")[0]}
-                </button>
-              </div>
-            }
-          />
+                  </div>
+                }
+              />
+          </div>
         </div>
       </section>
 

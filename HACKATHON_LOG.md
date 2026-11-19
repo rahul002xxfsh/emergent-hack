@@ -30,6 +30,12 @@ Every change Claude makes in this folder is recorded here, newest first.
 
 ## Change log
 
+### 2026-11-19 (couch + picker side by side, tap-to-hear greetings)
+- `web/components/ui/scroll-locked-video-hero.tsx`: the 260vh scroll-zoom hero is replaced by a simple full-screen intro (title + "Start venting" over the couch photo). The "Now on the couch" reel is now a `CouchPanel` component.
+- `web/components/landing.tsx`: "Now on the couch" (left) and "Pick your therapist" (right) now sit side by side in one section on laptop screens; the left panel stays in view while scrolling. On phones they stack. The couch panel follows whichever therapist is selected.
+- Tapping the couch panel mic plays that therapist's greeting in their Fish voice (loading spinner → "X is speaking…" with moving bars; tap again to stop). Falls back to the browser voice. Greetings are cached per page load.
+- `circular-testimonials.tsx`: new `stacked` option so the picker fits a half-width column.
+
 ### 2026-11-19 (Fish-only voices + real photos)
 - Removed the Magic Hour and AnyToSpeech keys from `web/.env.local` and from Vercel (Production + Preview), and their code. `web/app/api/voice/route.ts` is now Fish Audio only (model `s2.1-pro-free`); if Fish fails, the browser voice is used. `.env.example` and README updated. Only `FISH_API_KEY` remains.
 - Images: the cartoon SVG avatars are replaced with freely licensed photos from Wikimedia Commons in `web/public/personas/` (Trump: public domain; Snoop Dogg: CC BY 2.0; Amitabh Bachchan: CC BY-SA 4.0; Modi: GODL-India). They are used in the hero reel, therapist picker, session header and the Session Prescription card. A public-domain photo of Freud's therapy couch (`web/public/images/therapy-couch.jpg`) is the hero backdrop.

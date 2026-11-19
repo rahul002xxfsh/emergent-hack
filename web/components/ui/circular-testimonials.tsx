@@ -32,6 +32,8 @@ interface CircularTestimonialsProps {
   onChange?: (index: number) => void;
   /** Optional slot rendered under the quote (e.g. a "Start session" button). */
   footer?: React.ReactNode;
+  /** Stack the photos above the text (for narrow columns). */
+  stacked?: boolean;
 }
 
 function calculateGap(width: number) {
@@ -49,6 +51,7 @@ export const CircularTestimonials = ({
   fontSizes = {},
   onChange,
   footer,
+  stacked = false,
 }: CircularTestimonialsProps) => {
   const colorName = colors.name ?? "#000";
   const colorDesignation = colors.designation ?? "#6b7280";
@@ -140,9 +143,12 @@ export const CircularTestimonials = ({
   };
 
   return (
-    <div className="w-full max-w-4xl px-2 pb-4 pt-10 md:p-8">
-      <div className="grid gap-12 md:grid-cols-2 md:gap-20">
-        <div className="relative mx-auto h-80 w-full max-w-[280px] [perspective:1000px] md:h-96 md:max-w-none" ref={imageContainerRef}>
+    <div className={stacked ? "w-full px-2 pb-2 pt-8" : "w-full max-w-4xl px-2 pb-4 pt-10 md:p-8"}>
+      <div className={stacked ? "grid gap-10" : "grid gap-12 md:grid-cols-2 md:gap-20"}>
+        <div
+          className={stacked ? "relative mx-auto h-72 w-full max-w-[240px] [perspective:1000px]" : "relative mx-auto h-80 w-full max-w-[280px] [perspective:1000px] md:h-96 md:max-w-none"}
+          ref={imageContainerRef}
+        >
           {testimonials.map((t, index) => (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -150,7 +156,7 @@ export const CircularTestimonials = ({
               src={t.src}
               alt={t.name}
               onClick={() => { setActiveIndex(index); stopAutoplay(); }}
-              className="absolute h-full w-full cursor-pointer select-none rounded-3xl object-cover shadow-[0_10px_30px_rgba(0,0,0,0.3)]"
+              className="absolute h-full w-full cursor-pointer select-none rounded-3xl object-cover object-top shadow-[0_10px_30px_rgba(0,0,0,0.3)]"
               draggable={false}
               decoding="async"
               style={getImageStyle(index)}
