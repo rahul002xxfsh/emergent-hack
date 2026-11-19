@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { rateLimit, parseBody, VoiceBody } from "@/lib/guard";
 
 // Fish Audio text-to-speech: each therapist reply is spoken in that persona's Fish library voice.
 // Free model (s2.1-pro-free), ~1-2 s, MP3 returned to the browser as a data URL.
@@ -17,7 +18,11 @@ export async function POST(req: Request) {
   const key = process.env.FISH_API_KEY;
   if (!key) return NextResponse.json({ error: "no_key" }, { status: 503 });
 
-  const { personaId, text } = (await req.json().catch(() => ({}))) as { personaId?: string; text?: string };
+  const limited = rateLimit(req, "voice", 15);
+  if (limited) return limited;
+  const parsed = await parseBody(req, VoiceBody);
+  if ("error" in parsed) return parsed.error;
+  const { personaId, text } = parsed.data;
   const referenceId = Object.entries(FISH_VOICES).find(([k]) => personaId?.includes(k))?.[1];
   const prompt = (text ?? "").trim();
   if (!referenceId || !prompt) return NextResponse.json({ error: "bad_request" }, { status: 400 });
@@ -31,12 +36,12 @@ export async function POST(req: Request) {
       signal: AbortSignal.timeout(20_000),
     });
     if (!res.ok || !res.headers.get("content-type")?.includes("audio")) {
-      return NextResponse.json({ error: "fish_failed", status: res.status }, { status: 502 });
+      return NextResponse.json({ error: "voice_unavailable" }, { status: 502 });
     }
     const buf = Buffer.from(await res.arrayBuffer());
-    if (buf.length < 1000) return NextResponse.json({ error: "empty_audio" }, { status: 502 });
+    if (buf.length < 1000) return NextResponse.json({ error: "voice_unavailable" }, { status: 502 });
     return NextResponse.json({ url: `data:audio/mpeg;base64,${buf.toString("base64")}`, provider: "fish" });
   } catch {
-    return NextResponse.json({ error: "network" }, { status: 502 });
+    return NextResponse.json({ error: "voice_unavailable" }, { status: 502 });
   }
 }

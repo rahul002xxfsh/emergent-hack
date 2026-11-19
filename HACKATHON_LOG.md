@@ -30,6 +30,13 @@ Every change Claude makes in this folder is recorded here, newest first.
 
 ## Change log
 
+### 2026-11-19 (security audit)
+- Full audit against the team checklist; results in `SECURITY_AUDIT.md`.
+- New `web/lib/guard.ts`: zod input validation and per-visitor rate limits on `/api/chat` (20/min), `/api/voice` (15/min) and `/api/prescription` (8/min). Errors no longer expose internal details.
+- `web/next.config.ts`: HSTS, clickjacking protection, nosniff, referrer and permissions policies; `X-Powered-By` off; no browser source maps.
+- Removed unused files (default icons, old voice clips) and the `console.log` demo component. `npm audit`: 0 vulnerabilities (PostCSS pinned via overrides; React 19.3.1, Spline runtime 2.0.198).
+- Verified: no secrets in files, git history or browser bundles; full click-through works with no console errors.
+
 ### 2026-11-19 (less empty space, brighter hero)
 - Hero is no longer forced to full screen height: it sizes to its content with top padding for the menu, so the title no longer sits under the nav pill and the big empty gap is gone.
 - Hero couch photo visibility raised from 25% to 40% opacity (dark overlay slightly lighter too).

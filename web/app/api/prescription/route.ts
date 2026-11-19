@@ -3,6 +3,7 @@ import { z } from "zod";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { personas, buildPrescriptionPrompt, offlinePrescription, type ChatMessage, type CategoryId } from "@/lib/therapy";
 import { getClient, hasClaude, MODEL, describeError } from "@/lib/claude";
+import { rateLimit, parseBody, PrescriptionBody } from "@/lib/guard";
 
 const Prescription = z.object({
   diagnosis: z.string(),
@@ -11,7 +12,11 @@ const Prescription = z.object({
 });
 
 export async function POST(req: Request) {
-  const body = (await req.json()) as { personaId: string; category: CategoryId; messages: ChatMessage[]; stress: number };
+  const limited = rateLimit(req, "prescription", 8);
+  if (limited) return limited;
+  const parsed = await parseBody(req, PrescriptionBody);
+  if ("error" in parsed) return parsed.error;
+  const body = parsed.data as { personaId: string; category: CategoryId; messages: ChatMessage[]; stress?: number };
   const persona = personas.find((p) => p.id === body.personaId);
   if (!persona) return NextResponse.json({ error: "Unknown persona" }, { status: 400 });
 

@@ -4,9 +4,14 @@ import {
   MAX_REPLY_WORDS, type ChatMessage, type CategoryId,
 } from "@/lib/therapy";
 import { getClient, hasClaude, MODEL, describeError } from "@/lib/claude";
+import { rateLimit, parseBody, ChatBody } from "@/lib/guard";
 
 export async function POST(req: Request) {
-  const body = (await req.json()) as { personaId: string; category: CategoryId; messages: ChatMessage[] };
+  const limited = rateLimit(req, "chat", 20);
+  if (limited) return limited;
+  const parsed = await parseBody(req, ChatBody);
+  if ("error" in parsed) return parsed.error;
+  const body = parsed.data as { personaId: string; category: CategoryId; messages: ChatMessage[] };
   const persona = personas.find((p) => p.id === body.personaId);
   if (!persona) return NextResponse.json({ error: "Unknown persona" }, { status: 400 });
 
@@ -39,6 +44,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ reply: clampWords(text || "Tell me more.", MAX_REPLY_WORDS), source: "claude" });
   } catch (error) {
     console.error("chat error", describeError(error));
-    return NextResponse.json({ reply: offlineReply(persona, body.category, last.content, userTurns - 1), source: "demo", error: describeError(error) });
+    return NextResponse.json({ reply: offlineReply(persona, body.category, last.content, userTurns - 1), source: "demo" });
   }
 }
