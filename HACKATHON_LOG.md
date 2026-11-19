@@ -30,6 +30,17 @@ Every change Claude makes in this folder is recorded here, newest first.
 
 ## Change log
 
+### 2026-11-19 (interactive 3D therapist stage replaces generic robot)
+- Replaced the generic Spline metal robot in The Couch session tab with an interactive 3D **Therapist Stage** (`web/components/ui/therapist-stage.tsx`).
+- Connected directly to the chosen celebrity persona (Dwight, Trump, Ramsay, Sherlock, Miranda, Kanye):
+  - 3D interactive mouse parallax tracking (tilts with mouse depth layers).
+  - Doctor's office credentials plaque on the wall (e.g. Schrute Farms Agrarian Psychiatry, Trump Tower Institute, 3 Michelin Stars).
+  - Multi-ring animated speaking ripples & equalizer audio visualizer when speaking.
+  - Interactive "Tap to speak" trigger on the portrait.
+  - Live transcript thought bubble for the therapist's diagnosis.
+  - Seamless toggle in top-right corner to switch between [Therapist] and [3D Robot] views at any time.
+- Updated `HACKATHON_LOG.md` table and change log. Verified production build passes with zero errors.
+
 ### 2026-11-19 (client-side safety hardening & audio schema alignment)
 - Fixed potential client-side hydration exception in `web/components/landing.tsx`: added defensive type and null guards for speech synthesis voice detection (`typeof v.lang === "string"`, `typeof v.name === "string"`) and safe array checking (`Array.isArray(persona?.audio_clips)`).
 - Aligned `personas.json` and `web/data/personas.json` schema across all 6 personas so `audio_clips` is consistently initialized.
