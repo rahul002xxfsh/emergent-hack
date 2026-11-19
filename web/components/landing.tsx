@@ -9,6 +9,7 @@ import { scrollToSection } from "@/lib/scroll";
 import MetroHero from "@/components/ui/scroll-locked-video-hero";
 import { CircularTestimonials } from "@/components/ui/circular-testimonials";
 import { SplineScene } from "@/components/ui/splite";
+import { Therapist3D } from "@/components/ui/therapist-3d";
 import { Card } from "@/components/ui/card";
 import { Spotlight } from "@/components/ui/spotlight";
 import { VoiceChat, type VoiceStatus } from "@/components/ui/voice-chat";
@@ -56,6 +57,7 @@ export default function Landing() {
   const persona = personas[personaIndex] ?? personas[0];
   const color = (persona?.id && personaColors[persona.id]) ? personaColors[persona.id] : personaColors["dwight-schrute"];
   const [category, setCategory] = useState<CategoryId>("exams");
+  const [stageMode, setStageMode] = useState<"therapist" | "robot">("therapist");
   const [activeSection, setActiveSection] = useState("Home");
   const navLockRef = useRef(false); // true while a nav click is scrolling, so the highlight doesn't flicker
 
@@ -554,8 +556,46 @@ export default function Landing() {
             </div>
 
             {/* Right: 3D therapist */}
-            <div className="relative h-[380px] flex-1 md:h-full">
-              <SplineScene scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode" className="h-full w-full" />
+            <div className="relative h-[400px] flex-1 md:h-full overflow-hidden rounded-b-3xl md:rounded-bl-none md:rounded-r-3xl bg-gradient-to-b from-black/20 to-black/60">
+              {/* 3D Model Switcher Pill */}
+              <div className="absolute right-4 top-4 z-20 flex items-center gap-1 rounded-full border border-white/10 bg-black/60 p-1 backdrop-blur-md">
+                <button
+                  type="button"
+                  onClick={() => setStageMode("therapist")}
+                  className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+                    stageMode === "therapist"
+                      ? "bg-white text-black shadow-sm"
+                      : "text-neutral-400 hover:text-white"
+                  }`}
+                  title="3D Human Therapist character"
+                >
+                  👨‍⚕️ 3D Doctor
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setStageMode("robot")}
+                  className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+                    stageMode === "robot"
+                      ? "bg-white text-black shadow-sm"
+                      : "text-neutral-400 hover:text-white"
+                  }`}
+                  title="3D Robot model"
+                >
+                  🤖 3D Robot
+                </button>
+              </div>
+
+              {stageMode === "therapist" ? (
+                <Therapist3D
+                  status={status}
+                  accentColor={color.accent}
+                  personaName={persona.name}
+                  className="h-full w-full"
+                />
+              ) : (
+                <SplineScene scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode" className="h-full w-full" />
+              )}
+
               {lastReply && (
                 <motion.div
                   key={lastReply}

@@ -30,6 +30,15 @@ Every change Claude makes in this folder is recorded here, newest first.
 
 ## Change log
 
+### 2026-11-19 (feat: 3D interactive therapist character with mouse tracking)
+- Implemented real-time interactive 3D Therapist component in `web/components/ui/therapist-3d.tsx` using Three.js:
+  - Stylized 3D Doctor/Therapist character seated in an executive leather armchair, complete with doctor's coat, shirt, tie, stethoscope, spectacles/glasses, and sculpted hair.
+  - Interactive cursor tracking: 3D head and eyeballs dynamically track the user's mouse position with smooth damped lerp physics.
+  - Lifelike idle breathing animation and speech nodding cadence when answering.
+  - Reactive studio lighting: key, fill, and rim-light matched to the active persona's accent color.
+- Added 3D stage switcher in `web/components/landing.tsx` allowing instant live toggle between the 3D Doctor character and the 3D Robot.
+- Verified production build and restarted server on port 3100.
+
 ### 2026-11-19 (fix client exception boundary & state safety)
 - Added dedicated `web/app/error.tsx` client error boundary to prevent unhandled React exceptions from blanking the screen and provide instant one-click reload.
 - Hardened persona & color resolution in `web/components/landing.tsx` with fallback guards against transient undefined states.
