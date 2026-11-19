@@ -30,6 +30,11 @@ Every change Claude makes in this folder is recorded here, newest first.
 
 ## Change log
 
+### 2026-11-19 (rollback 3D therapist stage; restore Spline 3D robot)
+- Rolled back commit `c48e1f5` per user direction. Restored the original interactive Spline 3D robot scene (`https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode`) on The Couch.
+- Preserved celebrity audio clips, safety guards, and neural voice upgrades.
+- Rebuilt and restarted production server on port 3100.
+
 ### 2026-11-19 (client-side safety hardening & audio schema alignment)
 - Fixed potential client-side hydration exception in `web/components/landing.tsx`: added defensive type and null guards for speech synthesis voice detection (`typeof v.lang === "string"`, `typeof v.name === "string"`) and safe array checking (`Array.isArray(persona?.audio_clips)`).
 - Aligned `personas.json` and `web/data/personas.json` schema across all 6 personas so `audio_clips` is consistently initialized.
