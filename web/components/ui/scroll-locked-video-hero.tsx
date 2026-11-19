@@ -10,10 +10,10 @@ type GreetState = "idle" | "loading" | "playing";
 /** Intro screen: title + call to action over the therapy-room photo. */
 export default function MetroHero({ onStart }: { onStart?: () => void }) {
   return (
-    <section id="home" className="relative flex min-h-svh items-center justify-center overflow-hidden bg-[#050505] px-6">
+    <section id="home" className="relative flex items-center justify-center overflow-hidden bg-[#050505] px-6 pb-20 pt-40 md:pb-24 md:pt-48">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/images/therapy-couch.jpg" alt="" aria-hidden decoding="async" className="absolute inset-0 h-full w-full object-cover opacity-25" />
-      <div className="absolute inset-0 bg-gradient-to-b from-[#050505]/60 via-[#050505]/75 to-[#050505]" />
+      <img src="/images/therapy-couch.jpg" alt="" aria-hidden decoding="async" className="absolute inset-0 h-full w-full object-cover opacity-40" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#050505]/50 via-[#050505]/60 to-[#050505]" />
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}

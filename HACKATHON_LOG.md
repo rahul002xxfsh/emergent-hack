@@ -30,6 +30,11 @@ Every change Claude makes in this folder is recorded here, newest first.
 
 ## Change log
 
+### 2026-11-19 (less empty space, brighter hero)
+- Hero is no longer forced to full screen height: it sizes to its content with top padding for the menu, so the title no longer sits under the nav pill and the big empty gap is gone.
+- Hero couch photo visibility raised from 25% to 40% opacity (dark overlay slightly lighter too).
+- Tighter section spacing: therapist section top padding, Session and Prescription sections (the prescription section no longer forces a full-screen height). All 4 menu jumps re-checked and land exactly.
+
 ### 2026-11-19 (couch + picker side by side, tap-to-hear greetings)
 - `web/components/ui/scroll-locked-video-hero.tsx`: the 260vh scroll-zoom hero is replaced by a simple full-screen intro (title + "Start venting" over the couch photo). The "Now on the couch" reel is now a `CouchPanel` component.
 - `web/components/landing.tsx`: "Now on the couch" (left) and "Pick your therapist" (right) now sit side by side in one section on laptop screens; the left panel stays in view while scrolling. On phones they stack. The couch panel follows whichever therapist is selected.

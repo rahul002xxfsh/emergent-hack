@@ -484,7 +484,7 @@ export default function Landing() {
       <MetroHero onStart={() => scrollToId("personas")} />
 
       {/* 2. Now on the couch + Pick your therapist, side by side */}
-      <section id="personas" className="relative scroll-mt-24 overflow-x-clip px-4 py-24">
+      <section id="personas" className="relative scroll-mt-24 overflow-x-clip px-4 pb-24 pt-8 md:pt-10">
         <div className="mx-auto max-w-5xl text-center">
           <p className="text-sm uppercase tracking-[0.3em] text-amber-300/80">Step 1</p>
           <h2 className="mt-3 text-4xl font-bold md:text-6xl">Pick your therapist</h2>
@@ -545,7 +545,7 @@ export default function Landing() {
       </section>
 
       {/* 4. The couch: voice session */}
-      <section id="session" className="scroll-mt-24 px-4 py-24">
+      <section id="session" className="scroll-mt-24 px-4 py-16">
         <div className="mx-auto mb-10 max-w-6xl text-center">
           <p className="text-sm uppercase tracking-[0.3em] text-amber-300/80">Step 3</p>
           <h2 className="mt-3 text-4xl font-bold md:text-6xl">The couch</h2>
@@ -736,7 +736,7 @@ export default function Landing() {
       </section>
 
       {/* 5. Session prescription */}
-      <section id="prescription" className="min-h-[calc(100svh-6rem)] scroll-mt-24 px-4 py-24">
+      <section id="prescription" className="scroll-mt-24 px-4 pb-20 pt-16">
         <div className="mx-auto mb-10 max-w-4xl text-center">
           <p className="text-sm uppercase tracking-[0.3em] text-amber-300/80">Step 4</p>
           <h2 className="mt-3 text-4xl font-bold md:text-6xl">Your Session Prescription</h2>
