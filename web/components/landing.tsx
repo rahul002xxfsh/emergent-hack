@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { toPng } from "html-to-image";
-import { Download, Share2, RotateCcw, Send, Stethoscope, Keyboard, ShieldAlert, Home, Users, Mic, FileText } from "lucide-react";
+import { Download, Share2, RotateCcw, Send, Stethoscope, Keyboard, ShieldAlert, Home, Users, Mic, FileText, Lock } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { AnimeNavBar } from "@/components/ui/anime-navbar";
 import { scrollToSection } from "@/lib/scroll";
 import MetroHero from "@/components/ui/scroll-locked-video-hero";
@@ -679,12 +680,21 @@ export default function Landing() {
           <p className="text-sm uppercase tracking-[0.3em] text-amber-300/80">Step 4</p>
           <h2 className="mt-3 text-4xl font-bold md:text-6xl">Your Session Prescription</h2>
           <p className="mx-auto mt-4 max-w-xl text-neutral-400">
-            {prescription ? "Written from your session. Download it or send it to the friend who needs it more." : "End a session to get yours. Here's a sample from " + persona.name + "."}
+            {prescription ? "Written from your session. Download it or send it to the friend who needs it more." : "Locked until you finish a session. Talk to " + persona.name + ", then hit End session to reveal yours."}
           </p>
         </div>
 
         <div className="mx-auto max-w-md">
-          <div ref={cardRef} className="relative overflow-hidden rounded-3xl border-2 border-dashed p-7" style={{ borderColor: color.accent, background: "#fbf7f0", color: "#1c1917" }}>
+          <div className="relative">
+          <div
+            ref={cardRef}
+            aria-hidden={!prescription}
+            className={cn(
+              "relative overflow-hidden rounded-3xl border-2 border-dashed p-7 transition-[filter,opacity] duration-700 ease-out",
+              !prescription && "pointer-events-none select-none blur-md opacity-70"
+            )}
+            style={{ borderColor: color.accent, background: "#fbf7f0", color: "#1c1917" }}
+          >
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.25em]" style={{ color: color.accent }}>Rx · Session prescription</p>
@@ -709,12 +719,30 @@ export default function Landing() {
               PARODY
             </span>
           </div>
+          {!prescription && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-3xl bg-black/30 p-6 text-center">
+              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-black/70" style={{ boxShadow: `0 0 24px ${color.accent}66` }}>
+                {rxLoading ? <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" /> : <Lock className="h-5 w-5 text-white" />}
+              </span>
+              <p className="text-base font-semibold text-white drop-shadow">{rxLoading ? "Writing your prescription…" : "Finish your session to unlock"}</p>
+              {!rxLoading && (
+                <button
+                  onClick={() => scrollToId("session")}
+                  className="rounded-full px-5 py-2 text-sm font-semibold text-black transition duration-150 hover:brightness-110 active:scale-[0.97]"
+                  style={{ background: color.accent }}
+                >
+                  Go to session
+                </button>
+              )}
+            </div>
+          )}
+          </div>
 
           <div className="mt-5 flex gap-3">
-            <button onClick={downloadCard} className="flex flex-1 items-center justify-center gap-2 rounded-full border border-white/20 py-3 text-sm transition duration-150 hover:bg-white/10 active:scale-[0.97]">
+            <button onClick={downloadCard} disabled={!prescription} className="disabled:pointer-events-none disabled:opacity-40 flex flex-1 items-center justify-center gap-2 rounded-full border border-white/20 py-3 text-sm transition duration-150 hover:bg-white/10 active:scale-[0.97]">
               <Download className="h-4 w-4" /> Download
             </button>
-            <button onClick={shareCard} className="flex flex-1 items-center justify-center gap-2 rounded-full py-3 text-sm font-semibold text-black transition duration-150 hover:brightness-110 active:scale-[0.97]" style={{ background: color.accent }}>
+            <button onClick={shareCard} disabled={!prescription} className="disabled:pointer-events-none disabled:opacity-40 flex flex-1 items-center justify-center gap-2 rounded-full py-3 text-sm font-semibold text-black transition duration-150 hover:brightness-110 active:scale-[0.97]" style={{ background: color.accent }}>
               <Share2 className="h-4 w-4" /> Share
             </button>
           </div>

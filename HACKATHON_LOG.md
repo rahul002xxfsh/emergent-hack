@@ -30,6 +30,9 @@ Every change Claude makes in this folder is recorded here, newest first.
 
 ## Change log
 
+### 2026-11-19 (prescription locked until the session ends)
+- `web/components/landing.tsx`: the Session Prescription card is blurred with a lock overlay ("Finish your session to unlock" + "Go to session" button) until the user hits End session. While it is being written, the overlay shows a spinner. Download and Share stay disabled until it unlocks. Verified locally: blurred before, clear after End session.
+
 ### 2026-11-19 (fix: celebrity voice was blocked by the browser)
 - Bug: the Magic Hour clip arrives a few seconds after the click, so browsers blocked it as autoplay and the site fell back to the robotic browser voice.
 - Fix in `web/components/landing.tsx`: one shared audio player is unlocked (a silent sound) during the Send/mic click, then reused for the real voice clip. Verified with real clicks: the Trump clip plays and the browser voice no longer kicks in.
