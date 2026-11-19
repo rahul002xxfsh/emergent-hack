@@ -9,6 +9,8 @@ Every change Claude makes in this folder is recorded here, newest first.
 - **Solution approach:** 6 parody voice personas + Session Prescription card
 - **Product flow:** pick persona → greeting → vent (voice/text) → in-character replies → End Session → prescription card → share
 - **Team:** BakBak Bots (6 members)
+- **Live website:** https://emergent-hack.vercel.app
+- **Code:** https://github.com/rahul002xxfsh/emergent-hack (private)
 - **One-pager:** complete in `ONE_PAGER.pdf` / `ONE_PAGER.docx`, based on the team's edited version (due morning of Nov 19, 25%)
 - **Prototype:** not started (50%)
 - **Presentation:** not started (25%)
@@ -27,6 +29,12 @@ Every change Claude makes in this folder is recorded here, newest first.
 | `web/` | Next.js website prototype: landing page + working text/voice chat, edge-case rules, stress meter, prescription card. Run: `cd web && npm run build && npm start -- -p 3100` (fast) or `npm run dev` (live editing) |
 
 ## Change log
+
+### 2026-11-19 (GitHub + Vercel launch)
+- Created private GitHub repo **rahul002xxfsh/emergent-hack** with the whole project (website in `web/`, one-pager, personas, log, README). Excluded node_modules, build output, env files and local tool folders; scanned for secrets before pushing.
+- Created Vercel project **emergent-hack** (Hobby account), connected to the GitHub repo, root directory `web`, framework Next.js. Every push to `main` now redeploys production automatically.
+- Live at **https://emergent-hack.vercel.app** (public). Deployment-specific URLs stay behind Vercel's default login protection.
+- Verified live: page loads, chat API replies in character, crisis rule returns the helpline, prescription API works, avatars load, no console errors. Still demo mode (no API key on Vercel).
 
 ### 2026-11-19 (final audit: buttons, smoothness, speed)
 - Bugs fixed: left/right arrow keys while typing in the chat switched persona and wiped the conversation (now ignored in text fields and when the picker is off screen); chat input lost focus after every send (now stays focused, double-send blocked instead); invisible hero button was clickable before it faded in; Share/Download could fail silently (now show a status line, handle a closed share sheet, fall back to clipboard); End session disabled while a reply is loading; Send disabled over 250 words; first spoken reply now uses the right accent (voices pre-loaded).
