@@ -30,6 +30,12 @@ Every change Claude makes in this folder is recorded here, newest first.
 
 ## Change log
 
+### 2026-11-19 (demo replies now answer the actual question)
+- Problem: with no AI key, the demo engine repeated the same few scripted lines whatever the user asked.
+- New `web/lib/responder.ts` (no API, no cost): detects the topic (sleep, tiredness, breakup, crush/ghosting, loneliness, friends, family, exams, projects, boss, career, procrastination, anxiety, confidence, future, anger, sadness; falls back to the chosen category) and the kind of message (why / how / should I / what if / is it normal / venting). It reflects the user's own words back ("you're asking why you always feel tired after work") and answers with topic-specific explanations, practical steps and a follow-up question in each persona's voice (Trump, Snoop, Amitabh, Modi). Variants rotate so repeated messages don't get identical replies.
+- Team decision: do NOT add an Anthropic / Claude API key or use AI Gateway on the website; the site stays on this built-in engine.
+- Boundary eval still 198/198.
+
 ### 2026-11-19 (therapy-only boundary + edge-case dataset; captions only in voice chat)
 - Live captions now show only for voice chat replies (removed from the "Now on the couch" greeting).
 - New `web/lib/boundary.ts`: a rule filter that runs before the AI (and in demo mode). Off-topic requests and jailbreak attempts get exactly "This is not something we are here to discuss. Is there anything that I can help you with related to your therapy?". Covers politics/elections, news, celebrity gossip, movies/music trivia, coding, maths, homework/essay writing, general knowledge, shopping, recipes, medical/medication and legal advice, and "ignore your instructions" tricks. Venting that mentions these topics (e.g. "my code keeps failing and my boss is angry", "office politics is killing me") still gets a therapy reply.

@@ -97,6 +97,7 @@ export function precheck(text: string, userTurns: number): Precheck {
 }
 
 import { OFF_TOPIC_REPLY } from "@/lib/boundary";
+import { respond } from "@/lib/responder";
 
 // ---------- System prompt ----------
 export function buildSystemPrompt(persona: Persona, categoryId: CategoryId): string {
@@ -147,20 +148,11 @@ If the conversation contained a crisis, make the steps gentle and include contac
 }
 
 // ---------- Offline demo engine (used when no API key is configured) ----------
-const categoryLines: Record<CategoryId, string[]> = {
-  heartbreak: ["Heartbreak is just your heart doing cardio without permission.", "They left you on read; you will leave them in the past."],
-  career: ["Careers are long; one bad week is not your whole résumé.", "Every boss you fear is just a person with a calendar problem."],
-  exams: ["An exam measures one morning, not your entire worth.", "Group projects are 10% work and 90% chasing the one member who vanished."],
-  family: ["Families love loudly and listen quietly; give them a smaller, clearer message.", "Friends drift and return like Wi-Fi; check the signal before you panic."],
-  burnout: ["Burnout is your battery asking for a charger, not a lecture.", "Procrastination is fear in a hoodie; take off the hoodie with one tiny task."],
-};
-
-export function offlineReply(persona: Persona, categoryId: CategoryId, userText: string, turn: number): string {
+export function offlineReply(persona: Persona, categoryId: CategoryId, userText: string, turn: number, history: string[] = []): string {
   const usable = persona.catchphrases.filter((c) => !c.includes("..."));
-  const catch1 = usable[turn % usable.length];
-  const line = categoryLines[categoryId][turn % 2];
-  const step = persona.sample_prescription.three_step_rx[turn % 3];
-  return `${catch1} ${line} Here's your move: ${step} Now tell me, what's the part that's bothering you most?`;
+  const topicHint: Record<CategoryId, string> = { heartbreak: "heartbreak", career: "job", exams: "exam", family: "parents", burnout: "tired" };
+  const hinted = [...history, topicHint[categoryId]];
+  return respond(persona.id, userText, hinted, turn, usable);
 }
 
 export function offlinePrescription(persona: Persona, categoryId: CategoryId) {

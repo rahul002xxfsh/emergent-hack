@@ -29,7 +29,7 @@ export async function POST(req: Request) {
   if (hit) return NextResponse.json({ reply: OFF_TOPIC_REPLY, code: "off_topic", source: "rules" });
 
   if (!hasClaude()) {
-    return NextResponse.json({ reply: offlineReply(persona, body.category, last.content, userTurns - 1), source: "demo" });
+    return NextResponse.json({ reply: offlineReply(persona, body.category, last.content, userTurns - 1, messages.filter((m) => m.role === "user").slice(0, -1).map((m) => m.content)), source: "demo" });
   }
 
   try {
@@ -53,6 +53,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ reply: clampWords(text || "Tell me more.", MAX_REPLY_WORDS), source: "claude" });
   } catch (error) {
     console.error("chat error", describeError(error));
-    return NextResponse.json({ reply: offlineReply(persona, body.category, last.content, userTurns - 1), source: "demo" });
+    return NextResponse.json({ reply: offlineReply(persona, body.category, last.content, userTurns - 1, messages.filter((m) => m.role === "user").slice(0, -1).map((m) => m.content)), source: "demo" });
   }
 }
