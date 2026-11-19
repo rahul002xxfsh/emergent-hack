@@ -30,6 +30,11 @@ Every change Claude makes in this folder is recorded here, newest first.
 
 ## Change log
 
+### 2026-11-19 (fix client exception boundary & state safety)
+- Added dedicated `web/app/error.tsx` client error boundary to prevent unhandled React exceptions from blanking the screen and provide instant one-click reload.
+- Hardened persona & color resolution in `web/components/landing.tsx` with fallback guards against transient undefined states.
+- Rebuilt production bundle (`next build`) and restarted server on port 3100.
+
 ### 2026-11-19 (rollback 3D therapist stage; restore Spline 3D robot)
 - Rolled back commit `c48e1f5` per user direction. Restored the original interactive Spline 3D robot scene (`https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode`) on The Couch.
 - Preserved celebrity audio clips, safety guards, and neural voice upgrades.

@@ -53,8 +53,8 @@ function scrollToId(id: string) {
 
 export default function Landing() {
   const [personaIndex, setPersonaIndex] = useState(0);
-  const persona = personas[personaIndex];
-  const color = personaColors[persona.id];
+  const persona = personas[personaIndex] ?? personas[0];
+  const color = (persona?.id && personaColors[persona.id]) ? personaColors[persona.id] : personaColors["dwight-schrute"];
   const [category, setCategory] = useState<CategoryId>("exams");
   const [activeSection, setActiveSection] = useState("Home");
   const navLockRef = useRef(false); // true while a nav click is scrolling, so the highlight doesn't flicker
@@ -343,7 +343,7 @@ export default function Landing() {
     }
   }, [prescription, persona, flashRx]);
 
-  const shownRx = prescription ?? persona.sample_prescription;
+  const shownRx = prescription ?? persona?.sample_prescription ?? personas[0].sample_prescription;
   const categoryLabel = categories.find((c) => c.id === category)?.label;
 
   return (
