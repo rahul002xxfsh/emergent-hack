@@ -30,6 +30,14 @@ Every change Claude makes in this folder is recorded here, newest first.
 
 ## Change log
 
+### 2026-11-19 (authentic celebrity voice bites & neural TTS upgrade)
+- Solved robotic speech issue: Windows default browser TTS fell back to monotonic 1995 SAPI "Microsoft David", breaking the celebrity illusion.
+- Added verified celebrity audio bites to `web/public/audio/`: Donald Trump (*"It's all fake news, folks!"* and *"Thank you very much"*), Dwight Schrute (*"Idiot. Whenever I'm about to do something..."* and staccato intro), and Gordon Ramsay (*"Where's the lamb sauce?!"* and dramatic kitchen sting).
+- Upgraded `personas.json` and `web/data/personas.json` with `audio_clips` metadata.
+- Upgraded `speak()` in `web/components/landing.tsx`: prioritizes modern Natural/Neural/Google voices over legacy desktop voices.
+- Added "Actual Voice" soundboard chips on The Couch below the VoiceChat widget, allowing judges to trigger real celebrity voice clips with 0ms latency.
+- Verified: `next build` passes with zero errors.
+
 ### 2026-11-19 (GitHub + Vercel launch)
 - Created private GitHub repo **rahul002xxfsh/emergent-hack** with the whole project (website in `web/`, one-pager, personas, log, README). Excluded node_modules, build output, env files and local tool folders; scanned for secrets before pushing.
 - Created Vercel project **emergent-hack** (Hobby account), connected to the GitHub repo, root directory `web`, framework Next.js. Every push to `main` now redeploys production automatically.

@@ -14,6 +14,10 @@
       "I am faster than 80% of all snakes."
     ],
     "voice_config": { "pitch": 0.9, "rate": 1.15 },
+    "audio_clips": [
+      { "title": "Idiot", "src": "/audio/dwight_intro.mp3" },
+      { "title": "Idiot Advice", "src": "/audio/dwight_idiot.mp3" }
+    ],
     "sample_prescription": {
       "diagnosis": "Acute Procrastinatory Weakness, Stage 3. Untreated, you will be eaten by bears.",
       "three_step_rx": [
@@ -39,6 +43,10 @@
       "We're going to win so much."
     ],
     "voice_config": { "pitch": 0.8, "rate": 0.9 },
+    "audio_clips": [
+      { "title": "Fake News", "src": "/audio/trump_fake_news.mp3" },
+      { "title": "Thank You", "src": "/audio/trump_thank_you.mp3" }
+    ],
     "sample_prescription": {
       "diagnosis": "Low-Energy Stress Syndrome. A very bad deal, frankly a disaster, but totally fixable.",
       "three_step_rx": [
@@ -64,6 +72,10 @@
       "Beautiful. Stunning. Now do it again."
     ],
     "voice_config": { "pitch": 1.05, "rate": 1.2 },
+    "audio_clips": [
+      { "title": "Lamb Sauce", "src": "/audio/ramsay_lamb_sauce.mp3" },
+      { "title": "Kitchen Nightmare Sting", "src": "/audio/ramsay_violins.mp3" }
+    ],
     "sample_prescription": {
       "diagnosis": "Life Served Raw in the Middle. Overcooked on the outside, completely raw in the centre.",
       "three_step_rx": [

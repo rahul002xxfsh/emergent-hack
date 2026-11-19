@@ -146,6 +146,21 @@ export default function Landing() {
     resetSession();
   }, [personaIndex, category, resetSession]);
 
+  const playRealAudio = useCallback(
+    (clipSrc?: string) => {
+      const clips = (persona as unknown as { audio_clips?: Array<{ title: string; src: string }> }).audio_clips;
+      const src = clipSrc || (clips && clips.length > 0 ? clips[0].src : null);
+      if (!src) return;
+      window.speechSynthesis?.cancel();
+      const audio = new Audio(src);
+      setStatus("speaking");
+      audio.onended = () => setStatus("idle");
+      audio.onerror = () => setStatus("idle");
+      audio.play().catch(() => setStatus("idle"));
+    },
+    [persona]
+  );
+
   const speak = useCallback(
     (text: string) => {
       const synth = window.speechSynthesis;
@@ -159,7 +174,15 @@ export default function Landing() {
       u.rate = persona.voice_config.rate;
       const voices = synth.getVoices();
       const wanted = britishVoices.has(persona.id) ? "en-GB" : "en-US";
-      u.voice = voices.find((v) => v.lang === wanted) ?? voices.find((v) => v.lang.startsWith("en")) ?? null;
+      
+      // Prioritize modern natural / neural / google voices over robotic desktop voices
+      const natural = voices.find(
+        (v) =>
+          (v.lang === wanted || v.lang.startsWith(wanted)) &&
+          (v.name.includes("Natural") || v.name.includes("Neural") || v.name.includes("Google") || v.name.includes("Online"))
+      );
+      u.voice = natural ?? voices.find((v) => v.lang === wanted) ?? voices.find((v) => v.lang.startsWith("en")) ?? null;
+
       u.onend = () => setStatus("idle");
       u.onerror = () => setStatus("idle");
       setStatus("speaking");
@@ -429,6 +452,24 @@ export default function Landing() {
                 assistantLabel={`${persona.name} · parody therapist`}
                 className="min-h-0 h-[360px] bg-transparent"
               />
+
+              {/* Real Celebrity Voice Clips Soundboard */}
+              {(persona as unknown as { audio_clips?: Array<{ title: string; src: string }> }).audio_clips && (
+                <div className="mt-2 flex flex-wrap items-center justify-center gap-1.5 border-t border-white/5 pt-2">
+                  <span className="text-[11px] font-mono text-amber-400/90">🎙️ Actual Voice:</span>
+                  {(persona as unknown as { audio_clips: Array<{ title: string; src: string }> }).audio_clips.map((clip, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => playRealAudio(clip.src)}
+                      className="rounded-full border border-amber-500/40 bg-amber-950/40 px-2.5 py-0.5 text-xs text-amber-300 hover:bg-amber-900/60 hover:text-white transition shadow-sm active:scale-95"
+                      title={`Play real ${persona.name} audio`}
+                    >
+                      🔊 {clip.title}
+                    </button>
+                  ))}
+                </div>
+              )}
 
               <div ref={logRef} className="mt-2 h-48 space-y-2 overflow-y-auto pr-1 md:h-auto md:flex-1">
                 {messages.length === 0 && !interim && (
