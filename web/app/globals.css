@@ -1,0 +1,111 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: #050505;
+  --foreground: #f5f5f5;
+  --card: #0a0a0a;
+  --card-foreground: #f5f5f5;
+  --primary: #f5f5f5;
+  --primary-foreground: #0a0a0a;
+  --muted: #27272a;
+  --muted-foreground: #a1a1aa;
+  --border: rgba(255, 255, 255, 0.12);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --animate-spotlight: spotlight 2s ease 0.75s 1 forwards;
+}
+
+@keyframes spotlight {
+  0% { opacity: 0; transform: translate(-72%, -62%) scale(0.5); }
+  100% { opacity: 1; transform: translate(-50%, -40%) scale(1); }
+}
+
+* { border-color: var(--border); }
+
+html { scroll-behavior: auto; overscroll-behavior-y: none; }
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+/* ---------- Performance-friendly animations (transform/opacity only) ---------- */
+@keyframes vc-float {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.15; }
+  50% { transform: translate3d(12px, -18px, 0) scale(1.5); opacity: 0.45; }
+}
+.vc-particle { animation: vc-float 7s ease-in-out infinite; will-change: transform, opacity; }
+
+@keyframes vc-glow {
+  0%, 100% { transform: scale(1); opacity: 0.35; }
+  50% { transform: scale(1.1); opacity: 0.6; }
+}
+.vc-glow { animation: vc-glow 3s ease-in-out infinite; will-change: transform, opacity; transform: translateZ(0); }
+.vc-glow-active { animation-duration: 1.4s; }
+
+@keyframes vc-ring {
+  0% { transform: scale(1); opacity: 0.7; }
+  100% { transform: scale(1.9); opacity: 0; }
+}
+.vc-ring { animation: vc-ring 1.4s cubic-bezier(0.22, 1, 0.36, 1) infinite; will-change: transform, opacity; }
+
+.vc-bar { transform: scaleY(0.08); transition: transform 200ms ease, opacity 200ms ease; will-change: transform; }
+@keyframes vc-bar {
+  0%, 100% { transform: scaleY(0.1); }
+  50% { transform: scaleY(var(--peak, 0.8)); }
+}
+.vc-bar-active { animation: vc-bar 0.6s ease-in-out infinite; }
+
+@keyframes vc-volume {
+  0%, 100% { transform: scaleX(0.25); }
+  40% { transform: scaleX(0.85); }
+  70% { transform: scaleX(0.5); }
+}
+.vc-volume { animation: vc-volume 0.9s ease-in-out infinite; will-change: transform; }
+
+@keyframes vc-breathe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+.vc-breathe { animation: vc-breathe 2s ease-in-out infinite; }
+
+@keyframes reel-bar {
+  0%, 100% { transform: scaleY(0.2); }
+  50% { transform: scaleY(1); }
+}
+.reel-bar { animation: reel-bar 0.9s ease-in-out infinite; transform-origin: bottom; will-change: transform; }
+
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+.fade-in { animation: fade-in 0.5s ease forwards; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+}
+
+@keyframes nav-blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.1); }
+}
+.nav-blink { animation: nav-blink 3.6s ease-in-out infinite; transform-origin: center; }
+
+@keyframes nav-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+.nav-bob { animation: nav-bob 2.2s ease-in-out infinite; will-change: transform; }

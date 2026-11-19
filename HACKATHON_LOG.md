@@ -1,0 +1,94 @@
+# SSB x Emergent Hackathon: Project Log
+
+Every change Claude makes in this folder is recorded here, newest first.
+
+## Current status
+- **Date:** Nov 18, 2026 (kick-off day)
+- **Selected idea:** Celebrity Persona Therapist (from the shared list, type: Both)
+- **Problem statement:** small daily stress, no fun way to vent; generic bots feel flat (see `ONE_PAGER.md`)
+- **Solution approach:** 6 parody voice personas + Session Prescription card
+- **Product flow:** pick persona → greeting → vent (voice/text) → in-character replies → End Session → prescription card → share
+- **Team:** BakBak Bots (6 members)
+- **One-pager:** complete in `ONE_PAGER.pdf` / `ONE_PAGER.docx`, based on the team's edited version (due morning of Nov 19, 25%)
+- **Prototype:** not started (50%)
+- **Presentation:** not started (25%)
+- **Social posts (LinkedIn + X, every member):** not started (podium gate)
+
+## Files in this folder
+| File | Purpose |
+|---|---|
+| `HACKATHON_LOG.md` | This running log of all changes and decisions |
+| `CLAUDE.md` | Tells Claude to keep this log updated |
+| `ONE_PAGER.md` | Detailed notes version: every form + qwen.md field filled for the Celebrity Persona Therapist |
+| `ONE_PAGER.pdf` | **The submission one-pager**: the 1811 Labs form filled in, same layout (made from `ONE_PAGER_FORM.html`) |
+| `ONE_PAGER.docx` | Word version of the filled form (same table layout, yellow cells), editable |
+| `ONE_PAGER_FORM.html` | Editable source of the filled form; re-print to PDF after edits |
+| `personas.json` | 6 parody therapist personas for the Emergent build brief |
+| `web/` | Next.js website prototype: landing page + working text/voice chat, edge-case rules, stress meter, prescription card. Run: `cd web && npm run build && npm start -- -p 3100` (fast) or `npm run dev` (live editing) |
+
+## Change log
+
+### 2026-11-19 (final audit: buttons, smoothness, speed)
+- Bugs fixed: left/right arrow keys while typing in the chat switched persona and wiped the conversation (now ignored in text fields and when the picker is off screen); chat input lost focus after every send (now stays focused, double-send blocked instead); invisible hero button was clickable before it faded in; Share/Download could fail silently (now show a status line, handle a closed share sheet, fall back to clipboard); End session disabled while a reply is loading; Send disabled over 250 words; first spoken reply now uses the right accent (voices pre-loaded).
+- Speed: the 3D robot now pauses when off screen or the tab is hidden (was rendering every frame forever); hero carousel and voice-widget ambient animations pause off screen; persona quote reveal uses opacity/slide instead of per-word blur; lighter nav blur; persona list and 3D scene memoised; nav jumps re-target every frame so late layout shifts can't make them miss.
+- Measured: nav jumps went from ~40 fps to a steady 60 fps (16.7 ms/frame) with the 3D scene loaded; wheel scrolling over the robot scrolls the page normally.
+- Tested: 18/18 automated checks (hero button, arrows, card click, categories, start session, arrow keys while typing, 250-word block, chat reply, focus kept, off-topic deflection, stress meter, end session, download, try another therapist, all 4 nav tabs) on desktop; 21/21 nav jumps exact on a 375 px phone; no horizontal scroll; no console errors.
+
+### 2026-11-19 (smoother nav jumps)
+- Added `web/lib/scroll.ts`: eased smooth scroll (ease-in-out cubic, 450-950 ms depending on distance, lands 96 px below the nav, cancels instantly if the user scrolls or presses a key). Every in-page jump (nav, Start venting, Start session, Try another therapist) uses it; native CSS smooth scroll turned off so the two don't fight.
+- Nav highlight is locked to the clicked tab while the page scrolls, so it no longer flickers through the sections in between.
+- AnimeNavBar polish: one shared spring for pill + mascot, hover preview pill that glides between tabs, mascot does a small hop on each click, keyboard focus ring, and a thin scroll-progress line in the persona's colour.
+- Tested: Home > Prescription, Prescription > Home, Home > Session, Session > Therapists each made exactly one highlight change and landed exactly at the section heading.
+
+### 2026-11-19 (AnimeNavBar + layout)
+- Added `web/components/ui/anime-navbar.tsx` (AnimeNavBar): floating centred pill nav with a sliding active pill and a blinking mascot that hops to the active tab, tinted with the selected persona's colour. Items: Home, Therapists, Session, Prescription. Icons only on phones, labels from 640px up. Scroll-spy keeps the active tab in sync with the section on screen; clicks smooth-scroll.
+- Removed the old nav (logo, centre links, Start venting button). Added a "Start venting" button to the hero instead.
+- Layout: persona column is now name > quote > arrows > divider > categories > Start session; sections offset for the fixed nav; hero title no longer blocks clicks once it fades.
+- Verified on 1280px desktop and 375px phone: nav click scrolls to the section, mascot moves, no horizontal scroll.
+
+### 2026-11-19 (website polish + performance)
+- Removed the "The problem" text-scroll section (Skiper31) and deleted its component.
+- Performance: voice widget particles, glow, pulse rings, waveform and volume bar moved from per-frame React state to CSS transform/opacity animations (no re-renders while idle); timer ticks once per second; hero waveform bars are CSS; the Spline 3D scene loads only when scrolled near and fades in; persona card transitions shortened to 0.5s ease-out (was 0.8s bouncy), quote word reveal faster; lucide/framer imports optimised; Next dev badge hidden; reduced-motion respected.
+- Layout: phone persona cards now fit inside the screen; chat input gets full width with End session on its own row on phones; hero badge stays on one line; stress bar starts empty.
+- Now served as a production build (`npm run build && npm start`, port 3100). Verified: build passes, chat API works, desktop + 375px phone layouts, no console errors.
+
+### 2026-11-19 (decision)
+- Team chose to keep the website prototype in demo mode (no API key); replies come from the built-in demo engine.
+
+### 2026-11-19 (website prototype)
+- Built `web/` (Next.js 15 + Tailwind 4 + framer-motion) with the components the team chose: scroll-locked hero (MetroHero), text scroll reveal (Skiper31), persona picker (CircularTestimonials, illustrated SVG avatars, no real photos), session card (SplineScene robot + Spotlight + VoiceChat), and a Session Prescription card with Download (PNG) and Share.
+- Requirements covered: text + voice chat (browser speech-to-text and text-to-speech with per-persona pitch/rate); therapy-only scope (system prompt rules + off-topic deflection); edge cases (crisis to Tele-MANAS 14416/112, empty, gibberish, over 250 words, 12-turn limit, jailbreak/prompt reveal, medical advice, hate, real-person topics); 250-word input cap (live counter) and reply cap; prescription written from the whole conversation; keyword stress meter (0-100); 5 categories: Heartbreak, Career, Exams & Projects, Family & Friends, Burnout & Procrastination.
+- AI: `/api/chat` and `/api/prescription` call Claude (default claude-opus-5-5, effort low, server-side refusal fallback on chat) when `ANTHROPIC_API_KEY` is set in `web/.env.local`; otherwise built-in demo replies. Tested: all 6 edge cases, chat flow, prescription, mobile layout (375px, no horizontal scroll), no console errors.
+- Note: this session's working folder is the empty `/Users/rahul/Downloads/emergent hack.` (with a dot); all project files live in `/Users/rahul/Downloads/emergent hack`.
+
+### 2026-11-18 (night, team's version)
+- Team sent their edited form ("Group3Copy of SSB x 1811 Labs - Vibe Coding Hackathon.pdf"). Rebuilt `ONE_PAGER_FORM.html` → `ONE_PAGER.pdf` and `ONE_PAGER.docx` from it, keeping all their content and decisions: team **BakBak Bots** (Chirag 26020, Hridhya 26037, Khanjan 26042, Madhur Rai 26047, Rahul De 26065, Aarti 26004), users 18–30, optional login, prescription card as optional in the flow, their UI and good-to-have wording.
+- Light refinements only: restored the "Team Name" label (the team's copy had the team name in the label cell), cleaned grammar and punctuation, numbered the 3 UI screens, made "e.g. Gordon" generic, tidied the good-to-have list, and added "(optional login is a good-to-have)" to the login answer to match the flow.
+- Synced team name, members, 18–30 and the login answer into `ONE_PAGER.md`.
+
+### 2026-11-18 (night, UI answer)
+- Rewrote the UI answer (Inspiration / Style / 3 named screens / Always-on parody label) in `ONE_PAGER.md`, `ONE_PAGER_FORM.html`, and regenerated `ONE_PAGER.pdf` and `ONE_PAGER.docx`.
+
+### 2026-11-18 (night, Word file)
+- Created `ONE_PAGER.docx`: the filled 1811 Labs form as an editable Word document, same content and layout as `ONE_PAGER.pdf`.
+
+### 2026-11-18 (night, one-pager filled)
+- Filled every field of `ONE_PAGER.md` for the Celebrity Persona Therapist (team names/numbers still blank).
+- Filled the original 1811 Labs form in its exact layout (same table, yellow answer cells, rows 1–7 and 9) as `ONE_PAGER_FORM.html` → `ONE_PAGER.pdf` (2 pages). This replaces the earlier markdown-export PDF.
+
+### 2026-11-18 (evening, personas)
+- Idea being explored: **Celebrity Persona Therapist** (voice web app, parody advice + "Session Prescription" card).
+- Created `personas.json`: 6 personas (Dwight Schrute, Donald Trump, Gordon Ramsay, Sherlock Holmes, Miranda Priestly, Kanye West) with id, title, style tag, greeting, system prompt, 5 catchphrases, Web Speech voice config and a sample prescription. Every system prompt includes a parody framing, a no-AI-break rule, limits on real-person topics and a crisis safety rule (Tele-MANAS 14416). Validated as JSON.
+
+### 2026-11-18 (evening, removal)
+- Removed the Submission checklist from `ONE_PAGER.md` (on request) and regenerated `ONE_PAGER.pdf`.
+
+### 2026-11-18 (evening, later)
+- Exported `ONE_PAGER.md` to `ONE_PAGER.pdf` (5 pages, A4) with headless Chrome.
+
+### 2026-11-18 (evening)
+- Created `ONE_PAGER.md`. It follows the 1811 Labs form section by section (Team Details, Idea, Idea Breakdown, Engineering, Questions). Every qwen.md field is placed inside one of those sections, with no tables and no new sections. Handbook checklist items (social posts, Video Agent) were added to the submission checklist.
+
+### 2026-11-18
+- Read the full Participant Handbook and confirmed the rules, schedule, scoring and podium conditions.
+- Created `HACKATHON_LOG.md` (this file) and `CLAUDE.md`.
