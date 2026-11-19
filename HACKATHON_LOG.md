@@ -30,6 +30,10 @@ Every change Claude makes in this folder is recorded here, newest first.
 
 ## Change log
 
+### 2026-11-19 (fix: celebrity voice was blocked by the browser)
+- Bug: the Magic Hour clip arrives a few seconds after the click, so browsers blocked it as autoplay and the site fell back to the robotic browser voice.
+- Fix in `web/components/landing.tsx`: one shared audio player is unlocked (a silent sound) during the Send/mic click, then reused for the real voice clip. Verified with real clicks: the Trump clip plays and the browser voice no longer kicks in.
+
 ### 2026-11-19 (only 3 therapists: Trump, Snoop Dogg, Amitabh Bachchan)
 - Persona lineup cut to 3 at the team's request: Donald Trump, Snoop Dogg (new, "Chief Chill Officer") and Amitabh Bachchan (new, "Shahenshah of Sukoon", Hinglish). Modi was asked for but Magic Hour has no Modi voice, so Amitabh Bachchan was chosen instead.
 - All three speak replies in their Magic Hour voices. New parody avatars, colours and sample prescriptions added; old 5 personas and avatars removed. `personas.json` (root + web/data) updated.

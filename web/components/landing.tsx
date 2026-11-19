@@ -32,6 +32,7 @@ type SpeechRecognitionLike = {
   onerror: ((e: { error: string }) => void) | null;
 };
 
+const SILENT_WAV = "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=";
 const britishVoices = new Set<string>([]);
 
 const personaCards = personas.map((p) => ({
@@ -137,6 +138,16 @@ export default function Landing() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const speakIdRef = useRef(0);
   const voiceCacheRef = useRef(new Map<string, string>());
+  // One shared <audio> element, unlocked during the user's click, so the voice can still
+  // play a few seconds later when it arrives (browsers block late, gesture-less playback).
+  const playerRef = useRef<HTMLAudioElement | null>(null);
+  const unlockAudio = useCallback(() => {
+    if (typeof window === "undefined") return;
+    const a = playerRef.current ?? (playerRef.current = new Audio());
+    if (a.dataset.unlocked) return;
+    a.src = SILENT_WAV;
+    a.play().then(() => { a.dataset.unlocked = "1"; }).catch(() => {});
+  }, []);
   const stopVoice = useCallback(() => {
     speakIdRef.current++;
     audioRef.current?.pause();
@@ -243,7 +254,9 @@ export default function Landing() {
       }
       if (id !== speakIdRef.current) return; // user moved on
       if (!url) return browserSpeak(text, id);
-      const audio = new Audio(url);
+      const audio = playerRef.current ?? new Audio();
+      audio.pause();
+      audio.src = url;
       audioRef.current = audio;
       audio.onended = () => id === speakIdRef.current && setStatus("idle");
       audio.onerror = () => id === speakIdRef.current && browserSpeak(text, id);
@@ -255,6 +268,7 @@ export default function Landing() {
 
   const send = useCallback(
     async (text: string) => {
+      unlockAudio();
       const clean = text.trim();
       if (!clean || statusRef.current === "processing") return;
       if (countWords(clean) > MAX_INPUT_WORDS) {
@@ -282,10 +296,11 @@ export default function Landing() {
         setNotice("Couldn't reach the therapist. Check your connection and try again.");
       }
     },
-    [persona.id, category, speak]
+    [persona.id, category, speak, unlockAudio]
   );
 
   const toggleMic = useCallback(() => {
+    unlockAudio();
     if (status === "speaking") {
       stopVoice();
       setStatus("idle");
@@ -333,7 +348,7 @@ export default function Landing() {
     stopVoice();
     setStatus("listening");
     rec.start();
-  }, [status, send, stopVoice]);
+  }, [status, send, stopVoice, unlockAudio]);
 
   const endSession = useCallback(async () => {
     stopVoice();
