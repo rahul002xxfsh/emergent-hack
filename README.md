@@ -25,7 +25,7 @@ All four stay strictly off politics, religion and real-world claims, and drop th
 
 ## Features
 - Pick a therapist and one of 5 stress topics (Heartbreak, Career, Exams & Projects, Family & Friends, Burnout & Procrastination)
-- Talk by voice (mic) or text; replies are spoken out loud in a celebrity-style voice (Fish Audio first, then AnyToSpeech / Magic Hour, then the browser voice)
+- Talk by voice (mic) or text; replies are spoken out loud in a celebrity-style voice (Fish Audio, free `s2.1-pro-free` model; falls back to the browser voice)
 - Therapy-only scope with edge cases handled (crisis → helpline, off-topic, empty, gibberish, 250-word limit, 12-turn limit)
 - Live stress meter (0-100) from stress words
 - Session Prescription stays blurred until you end the session, then download it as a PNG or share it
@@ -36,4 +36,4 @@ cd web
 npm install
 npm run dev
 ```
-Every key is optional. Without any keys the app uses scripted demo replies and the browser voice. Copy `web/.env.example` to `web/.env.local` to add Claude (live replies) and the voice providers.
+Every key is optional. Without any keys the app uses scripted demo replies and the browser voice. Copy `web/.env.example` to `web/.env.local` to add Claude (live replies) and the Fish Audio voice key.

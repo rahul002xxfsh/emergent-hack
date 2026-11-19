@@ -31,7 +31,10 @@ function SessionReel() {
   const c = personaColors[p.id];
   return (
     <div ref={boxRef} className={`absolute inset-0 overflow-hidden ${onScreen ? "" : "[&_*]:[animation-play-state:paused]"}`} style={{ background: `radial-gradient(circle at 30% 20%, ${c.soft}, transparent 60%), #07070a` }}>
-      <div className="absolute inset-0 opacity-[0.07] [background-image:linear-gradient(#fff_1px,transparent_1px),linear-gradient(90deg,#fff_1px,transparent_1px)] [background-size:48px_48px]" />
+      {/* Therapy-room backdrop (Freud Museum couch, public domain) */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/images/therapy-couch.jpg" alt="" aria-hidden decoding="async" className="absolute inset-0 h-full w-full object-cover opacity-30" />
+      <div className="absolute inset-0" style={{ background: `radial-gradient(circle at 30% 20%, ${c.soft}, transparent 60%), linear-gradient(to bottom, rgba(7,7,10,0.55), rgba(7,7,10,0.9))` }} />
       <AnimatePresence mode="wait">
         <motion.div
           key={p.id}
@@ -42,7 +45,7 @@ function SessionReel() {
           className="absolute inset-0 flex flex-col items-center justify-center gap-6 px-6 text-center md:flex-row md:gap-12 md:text-left"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={`/avatars/${p.id}.svg`} alt="" decoding="async" className="h-40 w-32 rounded-3xl object-cover shadow-2xl md:h-64 md:w-52" style={{ boxShadow: `0 30px 80px -20px ${c.accent}` }} />
+          <img src={`/personas/${p.id}.jpg`} alt={p.name} decoding="async" className="h-40 w-32 rounded-3xl object-cover shadow-2xl md:h-64 md:w-52" style={{ boxShadow: `0 30px 80px -20px ${c.accent}` }} />
           <div className="max-w-xl">
             <p className="text-xs uppercase tracking-[0.3em]" style={{ color: c.text }}>Now on the couch · {p.title}</p>
             <p className="mt-3 text-2xl font-semibold text-white md:text-4xl">&ldquo;{p.greeting}&rdquo;</p>

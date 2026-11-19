@@ -40,7 +40,7 @@ const personaCards = personas.map((p) => ({
   quote: `“${p.greeting}”`,
   name: p.name,
   designation: `${p.title} · ${p.therapy_style_tag}`,
-  src: `/avatars/${p.id}.svg`,
+  src: `/personas/${p.id}.jpg`,
 }));
 
 const navItems = [
@@ -498,7 +498,7 @@ export default function Landing() {
           <div className="relative z-10 flex flex-wrap items-center justify-between gap-4 border-b border-white/10 px-5 py-4 md:px-8">
             <div className="flex items-center gap-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={`/avatars/${persona.id}.svg`} alt="" className="h-11 w-11 rounded-xl object-cover" />
+              <img src={`/personas/${persona.id}.jpg`} alt={persona.name} className="h-11 w-11 rounded-xl object-cover object-top" />
               <div>
                 <p className="font-semibold">{persona.name}</p>
                 <p className="text-xs" style={{ color: color.text }}>{persona.title} · {categoryLabel}</p>
@@ -701,7 +701,11 @@ export default function Landing() {
                 <p className="mt-1 text-lg font-bold">Dr. {persona.name}</p>
                 <p className="text-xs text-stone-500">{persona.title}</p>
               </div>
-              <Stethoscope className="h-7 w-7" style={{ color: color.accent }} />
+              <div className="flex items-center gap-2">
+                <Stethoscope className="h-6 w-6" style={{ color: color.accent }} />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={`/personas/${persona.id}.jpg`} alt="" className="h-12 w-12 rounded-full border-2 object-cover object-top" style={{ borderColor: color.accent }} />
+              </div>
             </div>
             <div className="my-4 border-t border-stone-300" />
             <p className="text-xs font-semibold uppercase tracking-wider text-stone-500">Topic · Stress level</p>
@@ -756,10 +760,18 @@ export default function Landing() {
       {/* Footer / safety */}
       <footer className="border-t border-white/10 px-6 py-10 text-center text-sm text-neutral-500">
         <p className="flex items-center justify-center gap-2 text-neutral-400">
-          <ShieldAlert className="h-4 w-4" /> Parody and entertainment only. Not real therapy, not affiliated with any celebrity.
+          <ShieldAlert className="h-4 w-4" /> Parody and entertainment only. Not real therapy, not affiliated with or endorsed by any celebrity.
         </p>
         <p className="mt-2">Struggling for real? Call Tele-MANAS 14416 (free, 24x7, India) or 112 in an emergency.</p>
         <p className="mt-4 text-neutral-600">Built by BakBak Bots · SSB x Emergent Vibe Coding Hackathon 2026</p>
+        <p className="mx-auto mt-2 max-w-3xl text-[11px] leading-relaxed text-neutral-600">
+          Photos via Wikimedia Commons, used under their licences; no endorsement implied:{" "}
+          <a className="underline hover:text-neutral-400" href="https://commons.wikimedia.org/wiki/File:Official_Presidential_Portrait_of_President_Donald_J._Trump_(2025).jpg" target="_blank" rel="noreferrer">Donald Trump</a> (Daniel Torok, public domain),{" "}
+          <a className="underline hover:text-neutral-400" href="https://commons.wikimedia.org/wiki/File:Snoop_Dogg,_WrestleMania_XL_(cropped)_(cropped).jpg" target="_blank" rel="noreferrer">Snoop Dogg</a> (Diego Serrano, CC BY 2.0),{" "}
+          <a className="underline hover:text-neutral-400" href="https://commons.wikimedia.org/wiki/File:Indian_actor_Amitabh_Bachchan.jpg" target="_blank" rel="noreferrer">Amitabh Bachchan</a> (Shrinivaskulkarni1388 / Junior Jumper, CC BY-SA 4.0),{" "}
+          <a className="underline hover:text-neutral-400" href="https://commons.wikimedia.org/wiki/File:The_official_portrait_of_Shri_Narendra_Modi,_the_Prime_Minister_of_the_Republic_of_India.jpg" target="_blank" rel="noreferrer">Narendra Modi</a> (Prime Minister&apos;s Office, GODL-India),{" "}
+          <a className="underline hover:text-neutral-400" href="https://commons.wikimedia.org/wiki/File:Freud_Museum_(Couch_and_Office)_in_2024.jpg" target="_blank" rel="noreferrer">therapy couch</a> (Marcelo, public domain).
+        </p>
       </footer>
     </main>
   );

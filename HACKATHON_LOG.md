@@ -30,6 +30,11 @@ Every change Claude makes in this folder is recorded here, newest first.
 
 ## Change log
 
+### 2026-11-19 (Fish-only voices + real photos)
+- Removed the Magic Hour and AnyToSpeech keys from `web/.env.local` and from Vercel (Production + Preview), and their code. `web/app/api/voice/route.ts` is now Fish Audio only (model `s2.1-pro-free`); if Fish fails, the browser voice is used. `.env.example` and README updated. Only `FISH_API_KEY` remains.
+- Images: the cartoon SVG avatars are replaced with freely licensed photos from Wikimedia Commons in `web/public/personas/` (Trump: public domain; Snoop Dogg: CC BY 2.0; Amitabh Bachchan: CC BY-SA 4.0; Modi: GODL-India). They are used in the hero reel, therapist picker, session header and the Session Prescription card. A public-domain photo of Freud's therapy couch (`web/public/images/therapy-couch.jpg`) is the hero backdrop.
+- Footer now credits every photo with author, licence and a link, and says no endorsement is implied.
+
 ### 2026-11-19 (copy cleanup to match the 4-therapist theme)
 - Website: replaced the developer-only "no AI key set" note with a friendly demo-mode line; the page description now names the 4 therapists; small comment fix in `voice-chat.tsx`.
 - `web/.env.example`: lists every optional key (Claude, Fish Audio, AnyToSpeech, Magic Hour) and the voice fallback order.
