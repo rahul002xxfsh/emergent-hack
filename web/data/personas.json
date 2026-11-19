@@ -101,6 +101,7 @@
       "Case closed."
     ],
     "voice_config": { "pitch": 1.0, "rate": 1.2 },
+    "audio_clips": [],
     "sample_prescription": {
       "diagnosis": "The Curious Case of the Vanishing Afternoon. Culprit: one phone, 47 open tabs, zero sleep.",
       "three_step_rx": [
@@ -126,6 +127,7 @@
       "Is there some reason this isn't done?"
     ],
     "voice_config": { "pitch": 0.95, "rate": 0.85 },
+    "audio_clips": [],
     "sample_prescription": {
       "diagnosis": "Chronic Last-Season Living. Your schedule is wrinkled and your priorities are wearing Crocs.",
       "three_step_rx": [
@@ -151,6 +153,7 @@
       "I'm just being real with you."
     ],
     "voice_config": { "pitch": 0.85, "rate": 1.1 },
+    "audio_clips": [],
     "sample_prescription": {
       "diagnosis": "Severe Creative Block, Genius Edition. The vision is there — it's just buffering.",
       "three_step_rx": [

@@ -148,45 +148,60 @@ export default function Landing() {
 
   const playRealAudio = useCallback(
     (clipSrc?: string) => {
-      const clips = (persona as unknown as { audio_clips?: Array<{ title: string; src: string }> }).audio_clips;
-      const src = clipSrc || (clips && clips.length > 0 ? clips[0].src : null);
+      if (typeof window === "undefined") return;
+      const clips = (persona as unknown as { audio_clips?: Array<{ title: string; src: string }> })?.audio_clips;
+      const src = clipSrc || (Array.isArray(clips) && clips.length > 0 ? clips[0]?.src : null);
       if (!src) return;
-      window.speechSynthesis?.cancel();
-      const audio = new Audio(src);
-      setStatus("speaking");
-      audio.onended = () => setStatus("idle");
-      audio.onerror = () => setStatus("idle");
-      audio.play().catch(() => setStatus("idle"));
+      try {
+        window.speechSynthesis?.cancel();
+        const audio = new Audio(src);
+        setStatus("speaking");
+        audio.onended = () => setStatus("idle");
+        audio.onerror = () => setStatus("idle");
+        audio.play().catch(() => setStatus("idle"));
+      } catch {
+        setStatus("idle");
+      }
     },
     [persona]
   );
 
   const speak = useCallback(
     (text: string) => {
+      if (typeof window === "undefined") return;
       const synth = window.speechSynthesis;
       if (!synth) {
         setStatus("idle");
         return;
       }
-      synth.cancel();
-      const u = new SpeechSynthesisUtterance(text);
-      u.pitch = persona.voice_config.pitch;
-      u.rate = persona.voice_config.rate;
-      const voices = synth.getVoices();
-      const wanted = britishVoices.has(persona.id) ? "en-GB" : "en-US";
-      
-      // Prioritize modern natural / neural / google voices over robotic desktop voices
-      const natural = voices.find(
-        (v) =>
-          (v.lang === wanted || v.lang.startsWith(wanted)) &&
-          (v.name.includes("Natural") || v.name.includes("Neural") || v.name.includes("Google") || v.name.includes("Online"))
-      );
-      u.voice = natural ?? voices.find((v) => v.lang === wanted) ?? voices.find((v) => v.lang.startsWith("en")) ?? null;
+      try {
+        synth.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        if (persona?.voice_config) {
+          u.pitch = persona.voice_config.pitch ?? 1;
+          u.rate = persona.voice_config.rate ?? 1;
+        }
+        const voices = Array.isArray(synth.getVoices?.()) ? synth.getVoices() : [];
+        const wanted = britishVoices.has(persona?.id ?? "") ? "en-GB" : "en-US";
+        
+        // Prioritize modern natural / neural / google voices safely
+        const natural = voices.find(
+          (v) =>
+            v &&
+            typeof v.lang === "string" &&
+            typeof v.name === "string" &&
+            (v.lang === wanted || v.lang.startsWith(wanted)) &&
+            (v.name.includes("Natural") || v.name.includes("Neural") || v.name.includes("Google") || v.name.includes("Online"))
+        );
+        u.voice = natural ?? voices.find((v) => v?.lang === wanted) ?? voices.find((v) => v?.lang?.startsWith?.("en")) ?? null;
 
-      u.onend = () => setStatus("idle");
-      u.onerror = () => setStatus("idle");
-      setStatus("speaking");
-      synth.speak(u);
+        u.onend = () => setStatus("idle");
+        u.onerror = () => setStatus("idle");
+        setStatus("speaking");
+        synth.speak(u);
+      } catch {
+        setStatus("idle");
+      }
     },
     [persona]
   );
@@ -454,7 +469,8 @@ export default function Landing() {
               />
 
               {/* Real Celebrity Voice Clips Soundboard */}
-              {(persona as unknown as { audio_clips?: Array<{ title: string; src: string }> }).audio_clips && (
+              {Array.isArray((persona as unknown as { audio_clips?: Array<{ title: string; src: string }> })?.audio_clips) &&
+                ((persona as unknown as { audio_clips: Array<{ title: string; src: string }> }).audio_clips.length > 0) && (
                 <div className="mt-2 flex flex-wrap items-center justify-center gap-1.5 border-t border-white/5 pt-2">
                   <span className="text-[11px] font-mono text-amber-400/90">🎙️ Actual Voice:</span>
                   {(persona as unknown as { audio_clips: Array<{ title: string; src: string }> }).audio_clips.map((clip, idx) => (
@@ -463,7 +479,7 @@ export default function Landing() {
                       type="button"
                       onClick={() => playRealAudio(clip.src)}
                       className="rounded-full border border-amber-500/40 bg-amber-950/40 px-2.5 py-0.5 text-xs text-amber-300 hover:bg-amber-900/60 hover:text-white transition shadow-sm active:scale-95"
-                      title={`Play real ${persona.name} audio`}
+                      title={`Play real ${persona?.name} audio`}
                     >
                       🔊 {clip.title}
                     </button>

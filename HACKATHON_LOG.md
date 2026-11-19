@@ -30,6 +30,11 @@ Every change Claude makes in this folder is recorded here, newest first.
 
 ## Change log
 
+### 2026-11-19 (client-side safety hardening & audio schema alignment)
+- Fixed potential client-side hydration exception in `web/components/landing.tsx`: added defensive type and null guards for speech synthesis voice detection (`typeof v.lang === "string"`, `typeof v.name === "string"`) and safe array checking (`Array.isArray(persona?.audio_clips)`).
+- Aligned `personas.json` and `web/data/personas.json` schema across all 6 personas so `audio_clips` is consistently initialized.
+- Built clean production bundle and restarted local server on port 3100.
+
 ### 2026-11-19 (authentic celebrity voice bites & neural TTS upgrade)
 - Solved robotic speech issue: Windows default browser TTS fell back to monotonic 1995 SAPI "Microsoft David", breaking the celebrity illusion.
 - Added verified celebrity audio bites to `web/public/audio/`: Donald Trump (*"It's all fake news, folks!"* and *"Thank you very much"*), Dwight Schrute (*"Idiot. Whenever I'm about to do something..."* and staccato intro), and Gordon Ramsay (*"Where's the lamb sauce?!"* and dramatic kitchen sting).
