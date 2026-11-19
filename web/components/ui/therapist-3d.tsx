@@ -89,8 +89,9 @@ export const Therapist3D = memo(function Therapist3D({
     scene.add(characterGroup);
     characterGroup.position.set(0, -0.65, 0);
 
-    let customHeadBone: THREE.Object3D | null = null;
+    let customHeadPivot: THREE.Group | null = null;
     let customModelGroup: THREE.Group | null = null;
+    let customBaseY = 0;
 
     if (modelUrl) {
       const loader = new GLTFLoader();
@@ -104,23 +105,48 @@ export const Therapist3D = memo(function Therapist3D({
           const box = new THREE.Box3().setFromObject(customModelGroup);
           const size = new THREE.Vector3();
           box.getSize(size);
-          const maxDim = Math.max(size.x, size.y, size.z);
-          const scale = 2.4 / (maxDim || 1);
-          customModelGroup.scale.setScalar(scale);
-
           const center = new THREE.Vector3();
           box.getCenter(center);
-          customModelGroup.position.set(-center.x * scale, -center.y * scale - 0.2, -center.z * scale);
 
+          // Normal human is ~1.8m tall. Target display height is ~2.3 units for a crisp bust portrait.
+          const scale = 2.3 / (size.y || 1);
+          customModelGroup.scale.setScalar(scale);
+
+          // Center horizontally and frame chest-to-head nicely
+          const targetY = -center.y * scale + 0.18;
+          customBaseY = targetY;
+          customModelGroup.position.set(-center.x * scale, targetY, -center.z * scale);
+
+          // Find head node or bone
+          let headNode: THREE.Object3D | null = null;
           customModelGroup.traverse((child) => {
-            if (/head|neck/i.test(child.name) && !customHeadBone) {
-              customHeadBone = child;
+            if (/head/i.test(child.name) && !headNode) {
+              headNode = child;
             }
             if (child instanceof THREE.Mesh) {
               child.castShadow = true;
               child.receiveShadow = true;
             }
           });
+
+          if (headNode && (headNode as THREE.Object3D).parent) {
+            const headBox = new THREE.Box3().setFromObject(headNode);
+            // Pivot at bottom center of the head (neck joint)
+            const neckPivot = new THREE.Vector3(
+              (headBox.min.x + headBox.max.x) / 2,
+              headBox.min.y + 0.04,
+              (headBox.min.z + headBox.max.z) / 2
+            );
+
+            const pivotGroup = new THREE.Group();
+            pivotGroup.name = "neck_pivot";
+            pivotGroup.position.copy(neckPivot);
+            (headNode as THREE.Object3D).parent!.add(pivotGroup);
+
+            (headNode as THREE.Object3D).position.sub(neckPivot);
+            pivotGroup.add(headNode as THREE.Object3D);
+            customHeadPivot = pivotGroup;
+          }
         },
         undefined,
         () => {
@@ -466,12 +492,20 @@ export const Therapist3D = memo(function Therapist3D({
       headGroup.rotation.x = targetHeadPitch;
       headGroup.rotation.z = targetHeadRoll;
 
-      if (customHeadBone) {
-        (customHeadBone as THREE.Object3D).rotation.y = targetHeadYaw;
-        (customHeadBone as THREE.Object3D).rotation.x = targetHeadPitch;
-      } else if (customModelGroup) {
-        (customModelGroup as THREE.Group).rotation.y = targetHeadYaw * 0.5;
-        (customModelGroup as THREE.Group).rotation.x = targetHeadPitch * 0.3;
+      if (customHeadPivot) {
+        (customHeadPivot as THREE.Group).rotation.y = targetHeadYaw * 0.75;
+        (customHeadPivot as THREE.Group).rotation.x = targetHeadPitch * 0.55;
+        (customHeadPivot as THREE.Group).rotation.z = targetHeadRoll * 0.3;
+      }
+      if (customModelGroup) {
+        const breathing = Math.sin(time * 1.8) * 0.012;
+        let speechNod = 0;
+        if (statusRef.current === "speaking") {
+          speechNod = Math.sin(time * 8.5) * 0.02 + Math.sin(time * 3.2) * 0.015;
+          if (customHeadPivot) (customHeadPivot as THREE.Group).rotation.x += speechNod;
+        }
+        (customModelGroup as THREE.Group).position.y = customBaseY + breathing;
+        (customModelGroup as THREE.Group).rotation.y = targetHeadYaw * 0.12;
       }
 
       // 2. EYE TRACKING (Pupils dart slightly faster to catch attention)

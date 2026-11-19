@@ -30,6 +30,12 @@ Every change Claude makes in this folder is recorded here, newest first.
 
 ## Change log
 
+### 2026-11-19 (feat: integrate Sketchfab Therapist 3D model with neck pivot tracking)
+- Integrated user-uploaded `Therapist.glb` 3D model from Sketchfab into `web/public/models/therapist.glb` (6.14 MB).
+- Upgraded `web/components/ui/therapist-3d.tsx` to automatically load the GLB model, frame the therapist bust portrait, and bind the model's `head` node to a custom neck pivot joint (`neck_pivot`).
+- Interactive mouse tracking now rotates the therapist's actual head smoothly on its neck with damped lerp physics, subtle breathing motion, and speech nodding.
+- Rebuilt production bundle and refreshed local server on port 3100.
+
 ### 2026-11-19 (AnyToSpeech for the Trump voice)
 - `web/app/api/voice/route.ts`: Trump replies now use AnyToSpeech (MCP over HTTP, `speech_synthesize` with `famous_slug: donald-trump`). It is synchronous and returns an MP3 in about 2 s, versus about 4 s on Magic Hour. If AnyToSpeech fails, Magic Hour is the backup, then the browser voice.
 - AnyToSpeech has no Snoop Dogg or Amitabh Bachchan voice, so those two stay on Magic Hour.
@@ -51,6 +57,7 @@ Every change Claude makes in this folder is recorded here, newest first.
 - `web/components/landing.tsx`: replies now play this generated voice; if it fails or credits run out, the browser voice takes over. Audio is cached per reply, and skip, new persona and end session all stop it. Merged with the teammates' 3D therapist and audio-clip work.
 - Key `MAGIC_HOUR_API_KEY` kept in `web/.env.local` (gitignored) and in Vercel env (Production + Preview). It is never committed.
 - Cost: 0.1 credit per character, so about 9–30 credits per reply. The account is on the free tier (367 credits left after testing, roughly 12–20 more replies).
+
 
 ### 2026-11-19 (feat: 3D interactive therapist character with mouse tracking)
 - Implemented real-time interactive 3D Therapist component in `web/components/ui/therapist-3d.tsx` using Three.js:
