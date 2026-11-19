@@ -30,6 +30,12 @@ Every change Claude makes in this folder is recorded here, newest first.
 
 ## Change log
 
+### 2026-11-19 (Emergent transfer pack)
+- New `EMERGENT_BUILD_BRIEF.md`: Part A (Plan Mode opening prompt), Part B (full spec: layout, 4 personas, therapy-style AI replies via Emergent's Universal Key and Claude, exact order of safety checks, crisis and off-topic replies, prescription, stress meter, Fish voices with IDs and autoplay fix, voice-chat-only live captions, security, performance), Part C (files to attach, secret to add, photo credits) and Part D (10-point acceptance checklist, including the 198-case boundary dataset).
+- AI replies now follow a 5-part therapy pattern (acknowledge, normalise, reframe, one small step, one question; 60–120 words) to fix "random" replies.
+- `EMERGENT_UPLOAD.zip` (local only, gitignored): brief + personas + dataset + rule files + photos + couch image + Trump clips + 3D model, ready to upload.
+- Decision: the Emergent build uses the Universal Key (Emergent credits), not a personal Anthropic key.
+
 ### 2026-11-19 (demo replies now answer the actual question)
 - Problem: with no AI key, the demo engine repeated the same few scripted lines whatever the user asked.
 - New `web/lib/responder.ts` (no API, no cost): detects the topic (sleep, tiredness, breakup, crush/ghosting, loneliness, friends, family, exams, projects, boss, career, procrastination, anxiety, confidence, future, anger, sadness; falls back to the chosen category) and the kind of message (why / how / should I / what if / is it normal / venting). It reflects the user's own words back ("you're asking why you always feel tired after work") and answers with topic-specific explanations, practical steps and a follow-up question in each persona's voice (Trump, Snoop, Amitabh, Modi). Variants rotate so repeated messages don't get identical replies.
