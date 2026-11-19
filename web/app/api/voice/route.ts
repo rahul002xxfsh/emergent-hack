@@ -10,6 +10,32 @@ const VOICES: Record<string, { voice: string; speed: number }> = {
   amitabh: { voice: "Amitabh Bachchan", speed: 0.95 },
 };
 
+// Fish Audio: main voice. Free model, ~2s, returns MP3 bytes (sent to the browser as a data URL).
+const FISH_VOICES: Record<string, string> = {
+  trump: "010da99c66f44d319159c8588315f22c",
+  snoop: "36383de9db3944e99f6063ee16ee4b58",
+  amitabh: "ea7cdc74aeae4b608be27fdc37fdcb05",
+};
+
+async function fishAudio(referenceId: string, text: string): Promise<string | null> {
+  const key = process.env.FISH_API_KEY;
+  if (!key) return null;
+  try {
+    const res = await fetch("https://api.fish.audio/v1/tts", {
+      method: "POST",
+      headers: { authorization: `Bearer ${key}`, "content-type": "application/json", model: process.env.FISH_MODEL || "s2.1-pro-free" },
+      body: JSON.stringify({ text, reference_id: referenceId, format: "mp3", latency: "balanced" }),
+      signal: AbortSignal.timeout(20_000),
+    });
+    if (!res.ok || !res.headers.get("content-type")?.includes("audio")) return null;
+    const buf = Buffer.from(await res.arrayBuffer());
+    if (buf.length < 1000) return null;
+    return `data:audio/mpeg;base64,${buf.toString("base64")}`;
+  } catch {
+    return null;
+  }
+}
+
 // AnyToSpeech (MCP over HTTP): synchronous, ~2s, returns an MP3 URL. Used first where it has the voice.
 const ATS_VOICES: Record<string, string> = { trump: "donald-trump" };
 
@@ -48,6 +74,12 @@ export async function POST(req: Request) {
   const prompt = (text ?? "").trim();
   if (!cfg || !prompt) return NextResponse.json({ error: "bad_request" }, { status: 400 });
   if (prompt.length > MAX_CHARS) return NextResponse.json({ error: "too_long" }, { status: 413 });
+
+  const fishId = Object.entries(FISH_VOICES).find(([k]) => personaId?.includes(k))?.[1];
+  if (fishId) {
+    const url = await fishAudio(fishId, prompt);
+    if (url) return NextResponse.json({ url, provider: "fish" });
+  }
 
   const atsSlug = Object.entries(ATS_VOICES).find(([k]) => personaId?.includes(k))?.[1];
   if (atsSlug) {

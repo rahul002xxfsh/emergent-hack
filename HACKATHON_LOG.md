@@ -30,6 +30,12 @@ Every change Claude makes in this folder is recorded here, newest first.
 
 ## Change log
 
+### 2026-11-19 (Fish Audio as the main voice)
+- `web/app/api/voice/route.ts`: all three therapists now speak with Fish Audio library voices (REST `POST /v1/tts`, free model `s2.1-pro-free`, MP3 returned to the browser as a data URL, about 1–2 s). Voice IDs: Trump 010da99c…, Snoop Dogg 36383de9…, Amitabh Bachchan ea7cdc74… (most-used Fish library voices). Done the Next.js way instead of the Python SDK from the plan; same API.
+- Fallback order: Fish → AnyToSpeech (Trump only) → Magic Hour → browser voice.
+- Not done: the plan's Path B (cloning from a short clip of the real person). We only use voices that already exist in the provider's library.
+- Key `FISH_API_KEY` is in `web/.env.local` (gitignored) and Vercel env (Production + Preview).
+
 ### 2026-11-19 (feat: integrate Sketchfab Therapist 3D model with neck pivot tracking)
 - Integrated user-uploaded `Therapist.glb` 3D model from Sketchfab into `web/public/models/therapist.glb` (6.14 MB).
 - Upgraded `web/components/ui/therapist-3d.tsx` to automatically load the GLB model, frame the therapist bust portrait, and bind the model's `head` node to a custom neck pivot joint (`neck_pivot`).
