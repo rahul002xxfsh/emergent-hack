@@ -30,6 +30,12 @@ Every change Claude makes in this folder is recorded here, newest first.
 
 ## Change log
 
+### 2026-11-19 (real-time captions while a therapist speaks)
+- New `web/components/ui/live-caption.tsx`: a subtitle bar fixed at the bottom of the screen that shows the therapist's words as they are spoken (newest word highlighted in the persona colour, about 2 lines visible, fades out 1.6 s after speech ends).
+- Sync: Fish audio follows the clip's playback position (`currentTime / duration`, word by word); the browser-voice fallback uses the browser's word-boundary events, with a timing estimate if those aren't sent. A tiny external store means only the caption bar re-renders during playback.
+- Hooked into session replies and the "Now on the couch" greeting mic; stops instantly on skip, persona change or a new reply. The static caption in the 3D stage is renamed "Last reply".
+- Tested: an 18-word greeting reveals ~3 words at 0.6 s and all 18 at 4.9 s (clip length); a 12.8 s reply advances live; works on phone width with no sideways scroll.
+
 ### 2026-11-19 (security audit)
 - Full audit against the team checklist; results in `SECURITY_AUDIT.md`.
 - New `web/lib/guard.ts`: zod input validation and per-visitor rate limits on `/api/chat` (20/min), `/api/voice` (15/min) and `/api/prescription` (8/min). Errors no longer expose internal details.

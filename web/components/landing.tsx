@@ -14,6 +14,7 @@ import { Therapist3D } from "@/components/ui/therapist-3d";
 import { Card } from "@/components/ui/card";
 import { Spotlight } from "@/components/ui/spotlight";
 import { VoiceChat, type VoiceStatus } from "@/components/ui/voice-chat";
+import { LiveCaption, caption } from "@/components/ui/live-caption";
 import {
   personas, personaColors, categories, countWords, stressScore, stressLabel,
   MAX_INPUT_WORDS, type ChatMessage, type CategoryId,
@@ -156,6 +157,7 @@ export default function Landing() {
     audioRef.current?.pause();
     audioRef.current = null;
     window.speechSynthesis?.cancel();
+    caption.stop();
   }, []);
 
   // New persona or topic = new session
@@ -221,9 +223,19 @@ export default function Landing() {
             (v.name.includes("Natural") || v.name.includes("Neural") || v.name.includes("Google") || v.name.includes("Online"))
         );
         u.voice = natural ?? voices.find((v) => v?.lang === wanted) ?? voices.find((v) => v?.lang?.startsWith?.("en")) ?? null;
-        u.onend = () => id === speakIdRef.current && setStatus("idle");
-        u.onerror = () => id === speakIdRef.current && setStatus("idle");
+        u.onend = () => {
+          if (id !== speakIdRef.current) return;
+          caption.finish();
+          setStatus("idle");
+        };
+        u.onerror = () => {
+          if (id !== speakIdRef.current) return;
+          caption.stop();
+          setStatus("idle");
+        };
+        u.onboundary = (e) => id === speakIdRef.current && caption.boundary(e.charIndex, e.charLength);
         setStatus("speaking");
+        caption.followSpeech(text, persona?.name ?? "", personaColors[persona?.id ?? ""]?.accent ?? "#fff", u.rate);
         synth.speak(u);
       } catch {
         setStatus("idle");
@@ -261,12 +273,17 @@ export default function Landing() {
       audio.pause();
       audio.src = url;
       audioRef.current = audio;
-      audio.onended = () => id === speakIdRef.current && setStatus("idle");
+      audio.onended = () => {
+        if (id !== speakIdRef.current) return;
+        caption.finish();
+        setStatus("idle");
+      };
       audio.onerror = () => id === speakIdRef.current && browserSpeak(text, id);
       setStatus("speaking");
+      caption.followAudio(text, persona.name, personaColors[persona.id]?.accent ?? "#fff", audio);
       audio.play().catch(() => id === speakIdRef.current && browserSpeak(text, id));
     },
-    [persona.id, stopVoice, browserSpeak]
+    [persona.id, persona.name, stopVoice, browserSpeak]
   );
 
   // Hero "Now on the couch" mic: speak the selected therapist's greeting in their Fish voice.
@@ -299,7 +316,12 @@ export default function Landing() {
       }
     }
     if (id !== speakIdRef.current) return;
-    const done = () => id === speakIdRef.current && setGreet("idle");
+    const accent = personaColors[persona.id]?.accent ?? "#fff";
+    const done = () => {
+      if (id !== speakIdRef.current) return;
+      caption.finish();
+      setGreet("idle");
+    };
     if (!url) {
       const synth = window.speechSynthesis;
       if (!synth) return done();
@@ -308,7 +330,9 @@ export default function Landing() {
       u.rate = persona.voice_config?.rate ?? 1;
       u.onend = done;
       u.onerror = done;
+      u.onboundary = (e) => id === speakIdRef.current && caption.boundary(e.charIndex, e.charLength);
       setGreet("playing");
+      caption.followSpeech(text, persona.name, accent, u.rate);
       synth.speak(u);
       return;
     }
@@ -319,6 +343,7 @@ export default function Landing() {
     audio.onended = done;
     audio.onerror = done;
     setGreet("playing");
+    caption.followAudio(text, persona.name, accent, audio);
     audio.play().catch(done);
   }, [greet, persona, stopVoice, unlockAudio]);
 
@@ -726,7 +751,7 @@ export default function Landing() {
                   animate={{ opacity: 1, y: 0 }}
                   className="pointer-events-none absolute inset-x-6 bottom-6 rounded-2xl border border-white/10 bg-black/70 p-4 text-sm backdrop-blur"
                 >
-                  <p className="mb-1 text-[11px] uppercase tracking-[0.2em]" style={{ color: color.text }}>Live caption</p>
+                  <p className="mb-1 text-[11px] uppercase tracking-[0.2em]" style={{ color: color.text }}>Last reply</p>
                   <p className="line-clamp-4 text-neutral-200">{lastReply}</p>
                 </motion.div>
               )}
@@ -834,6 +859,7 @@ export default function Landing() {
           <a className="underline hover:text-neutral-400" href="https://commons.wikimedia.org/wiki/File:Freud_Museum_(Couch_and_Office)_in_2024.jpg" target="_blank" rel="noreferrer">therapy couch</a> (Marcelo, public domain).
         </p>
       </footer>
+      <LiveCaption />
     </main>
   );
 }
