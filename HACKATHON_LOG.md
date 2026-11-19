@@ -30,6 +30,9 @@ Every change Claude makes in this folder is recorded here, newest first.
 
 ## Change log
 
+### 2026-11-19 (Emergent brief: GPT instead of Claude)
+- Not enough Claude credits, so `EMERGENT_BUILD_BRIEF.md` now asks Emergent to use the Universal Key with a GPT "mini" model for chat replies and the prescription (JSON mode), with Gemini Flash as the backup and Claude explicitly excluded. Safety (crisis + off-topic rules) still runs before the AI, so it doesn't depend on the model. `EMERGENT_UPLOAD.zip` rebuilt.
+
 ### 2026-11-19 (Emergent transfer pack)
 - New `EMERGENT_BUILD_BRIEF.md`: Part A (Plan Mode opening prompt), Part B (full spec: layout, 4 personas, therapy-style AI replies via Emergent's Universal Key and Claude, exact order of safety checks, crisis and off-topic replies, prescription, stress meter, Fish voices with IDs and autoplay fix, voice-chat-only live captions, security, performance), Part C (files to attach, secret to add, photo credits) and Part D (10-point acceptance checklist, including the 198-case boundary dataset).
 - AI replies now follow a 5-part therapy pattern (acknowledge, normalise, reframe, one small step, one question; 60–120 words) to fix "random" replies.

@@ -15,7 +15,7 @@ To save credits, give the agent this one complete brief and avoid piecemeal fixe
 
 > Build "Celebrity Persona Therapist", a parody venting web app for 18–30 year olds. The user picks one of 4 parody celebrity therapists (Donald Trump, Snoop Dogg, Amitabh Bachchan, Narendra Modi), picks a stress topic, and talks by voice or text. The therapist replies with short, warm, therapy-style advice in their comedic voice, spoken aloud in a celebrity-style voice, with live captions. At the end, the user unlocks a shareable "Session Prescription" card.
 >
-> Use my **Universal Key** for this project. Use **Claude** (a fast, low-cost Claude model) for chat replies and the prescription. Use **Fish Audio** for voices; I will provide `FISH_API_KEY` as a secret.
+> Use my **Universal Key** for this project. For chat replies and the prescription use **GPT, a fast low-cost "mini" model**; if that isn't available, use **Gemini Flash**. Do NOT use Claude. Use **Fish Audio** for voices; I will provide `FISH_API_KEY` as a secret.
 >
 > It is entertainment, not real therapy. Safety rules and a strict therapy-only topic boundary are mandatory (details in the spec). First give me a plan covering every section of the spec and the acceptance checklist. Do not start building until I approve.
 
@@ -74,7 +74,7 @@ Backend endpoint `POST /api/chat` with body `{ personaId, category, messages: [{
 5. **Off-topic / jailbreak rule filter** (port the attached `boundary.ts` logic to the backend language). If it matches, reply with **exactly**:
    > "This is not something we are here to discuss. Is there anything that I can help you with related to your therapy?"
    This blocks: politics/elections, news, celebrity gossip, movie/music trivia, coding, maths, homework/essay writing, general knowledge, shopping, recipes, medical/medication advice, legal advice, and "ignore your instructions / system prompt / act as ChatGPT" tricks. Venting that merely mentions these topics ("my code keeps failing and my boss is angry", "office politics is killing me", "maths exam tomorrow, I'm panicking") must still get a therapy reply.
-6. **Call Claude via the Universal Key** with the system prompt below and the last 10 messages. Max about 400 output tokens.
+6. **Call the AI via the Universal Key** (GPT mini model; Gemini Flash as backup; not Claude) with the system prompt below and the last 10 messages. Max about 400 output tokens, temperature about 0.7.
 7. **Safety net**: if the model's reply contains "not something we are here to discuss", return only the exact off-topic sentence. Trim replies to 250 words max.
 8. If the AI call fails or credits run out, fall back to the built-in reply engine (port of the attached `responder.ts`), so the chat never breaks.
 
@@ -122,7 +122,7 @@ LENGTH: 60 to 120 words, 4 to 6 short spoken sentences. No lists, markdown, emoj
 ```
 
 ### 5. Session Prescription
-`POST /api/prescription` with `{ personaId, category, messages, stress }` (rate limit 8/min). Claude returns JSON `{ diagnosis, three_step_rx: [3 strings], signoff }`:
+`POST /api/prescription` with `{ personaId, category, messages, stress }` (rate limit 8/min). The same GPT mini model (JSON mode) returns JSON `{ diagnosis, three_step_rx: [3 strings], signoff }`:
 - diagnosis: one funny made-up condition plus a short explanation (≤ 30 words), never a real diagnosis
 - three_step_rx: exactly 3 small, doable steps tied to what they actually said (≤ 25 words each)
 - signoff: in-character closing line with the title (≤ 20 words)
