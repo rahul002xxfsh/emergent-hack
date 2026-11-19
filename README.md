@@ -36,8 +36,7 @@ The chatbot only talks about the user's own stress, feelings and everyday strugg
 
 It works in three layers:
 1. **Rules before any AI call** (`web/lib/boundary.ts`): catch jailbreak attempts, politics, news, gossip, movie and music trivia, coding, maths, homework and writing, general knowledge, shopping, recipes, and medical or legal advice. Crisis messages are checked first and always get the helpline reply (Tele-MANAS 14416, 112).
-2. **AI instructions** (`buildSystemPrompt` in `web/lib/therapy.ts`): the strict domain boundary plus worked examples for the subtle cases.
-3. **Safety net**: if the AI uses the off-topic sentence, only that sentence is sent.
+2. **Built-in replies** (`web/lib/responder.ts`): everything that passes the rules gets a question-aware, therapy-style reply in the persona's voice. No external AI key is used.
 
 **Edge-case dataset:** `web/data/boundary-dataset.json` has 198 labelled messages (therapy / off_topic / crisis), including tricky venting such as "my code keeps failing and my manager is angry", Hinglish, and 60 messages added after the rules were written. Run it against a local server:
 ```bash
@@ -52,4 +51,4 @@ cd web
 npm install
 npm run dev
 ```
-Every key is optional. Without any keys the app uses scripted demo replies and the browser voice. Copy `web/.env.example` to `web/.env.local` to add Claude (live replies) and the Fish Audio voice key.
+The only key is the optional Fish Audio voice key (copy `web/.env.example` to `web/.env.local`). Without it the browser voice is used. No Claude/Anthropic key is used anywhere.

@@ -30,6 +30,12 @@ Every change Claude makes in this folder is recorded here, newest first.
 
 ## Change log
 
+### 2026-11-19 (Claude fully removed from the website)
+- Team rule: no Claude / Anthropic API key anywhere, for anything.
+- Removed `web/lib/claude.ts`, the `@anthropic-ai/sdk` package, the Claude code paths in `/api/chat` and `/api/prescription`, the AI system prompts, and `ANTHROPIC_API_KEY` / `CLAUDE_MODEL` from `.env.example`. README updated.
+- Chat replies come only from the built-in question-aware engine; prescriptions come from each persona's built-in prescription for the topic. The only key left is the optional `FISH_API_KEY` (voice).
+- Verified: build passes, boundary eval 198/198, chat and prescription work, `npm audit` 0 vulnerabilities.
+
 ### 2026-11-19 (Emergent brief: GPT instead of Claude)
 - Not enough Claude credits, so `EMERGENT_BUILD_BRIEF.md` now asks Emergent to use the Universal Key with a GPT "mini" model for chat replies and the prescription (JSON mode), with Gemini Flash as the backup and Claude explicitly excluded. Safety (crisis + off-topic rules) still runs before the AI, so it doesn't depend on the model. `EMERGENT_UPLOAD.zip` rebuilt.
 
