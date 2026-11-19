@@ -8,7 +8,7 @@ import { AnimeNavBar } from "@/components/ui/anime-navbar";
 import { scrollToSection } from "@/lib/scroll";
 import MetroHero from "@/components/ui/scroll-locked-video-hero";
 import { CircularTestimonials } from "@/components/ui/circular-testimonials";
-import { TherapistStage } from "@/components/ui/therapist-stage";
+import { SplineScene } from "@/components/ui/splite";
 import { Card } from "@/components/ui/card";
 import { Spotlight } from "@/components/ui/spotlight";
 import { VoiceChat, type VoiceStatus } from "@/components/ui/voice-chat";
@@ -553,15 +553,20 @@ export default function Landing() {
               )}
             </div>
 
-            {/* Right: Interactive 3D Therapist Stage */}
-            <div className="relative min-h-[420px] flex-1 md:h-full">
-              <TherapistStage
-                persona={persona}
-                status={status}
-                lastReply={lastReply}
-                color={color}
-                onTriggerVoice={() => playRealAudio()}
-              />
+            {/* Right: 3D therapist */}
+            <div className="relative h-[380px] flex-1 md:h-full">
+              <SplineScene scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode" className="h-full w-full" />
+              {lastReply && (
+                <motion.div
+                  key={lastReply}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="pointer-events-none absolute inset-x-6 bottom-6 rounded-2xl border border-white/10 bg-black/70 p-4 text-sm backdrop-blur"
+                >
+                  <p className="mb-1 text-[11px] uppercase tracking-[0.2em]" style={{ color: color.text }}>Live caption</p>
+                  <p className="line-clamp-4 text-neutral-200">{lastReply}</p>
+                </motion.div>
+              )}
             </div>
           </div>
         </Card>
