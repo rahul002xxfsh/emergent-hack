@@ -17,7 +17,7 @@ import { VoiceChat, type VoiceStatus } from "@/components/ui/voice-chat";
 import { LiveCaption, caption } from "@/components/ui/live-caption";
 import {
   personas, personaColors, categories, countWords, stressScore, stressLabel,
-  MAX_INPUT_WORDS, type ChatMessage, type CategoryId,
+  MAX_INPUT_WORDS, isCrisis, clampWords, CRISIS_REPLY, type ChatMessage, type CategoryId,
 } from "@/lib/therapy";
 
 type Prescription = { diagnosis: string; three_step_rx: string[]; signoff: string };
@@ -347,11 +347,22 @@ export default function Landing() {
       unlockAudio();
       const clean = text.trim();
       if (!clean || statusRef.current === "processing") return;
-      if (countWords(clean) > MAX_INPUT_WORDS) {
+      const crisis = isCrisis(clean);
+      const tooLong = countWords(clean) > MAX_INPUT_WORDS;
+      if (tooLong && !crisis) {
         setNotice(`Keep it under ${MAX_INPUT_WORDS} words.`);
         return;
       }
       setNotice(null);
+      if (tooLong) {
+        // A long message about self-harm skips the word limit and gets the helpline straight away,
+        // without a server round trip (the API caps message size).
+        setMessages([...messagesRef.current, { role: "user", content: clampWords(clean, MAX_INPUT_WORDS).slice(0, 2400) }, { role: "assistant", content: CRISIS_REPLY }]);
+        setInput("");
+        setSource("rules");
+        speak(CRISIS_REPLY);
+        return;
+      }
       const next: ChatMessage[] = [...messagesRef.current, { role: "user", content: clean }];
       setMessages(next);
       setInput("");
@@ -680,7 +691,7 @@ export default function Landing() {
                     {inputWords}/{MAX_INPUT_WORDS}
                   </span>
                 </div>
-                <button type="submit" aria-label="Send" disabled={status === "processing" || !input.trim() || inputWords > MAX_INPUT_WORDS} className="rounded-full bg-white p-2.5 text-black transition-transform duration-150 hover:scale-105 active:scale-95 disabled:opacity-40 disabled:hover:scale-100">
+                <button type="submit" aria-label="Send" disabled={status === "processing" || !input.trim() || (inputWords > MAX_INPUT_WORDS && !isCrisis(input))} className="rounded-full bg-white p-2.5 text-black transition-transform duration-150 hover:scale-105 active:scale-95 disabled:opacity-40 disabled:hover:scale-100">
                   <Send className="h-4 w-4" />
                 </button>
                 <button

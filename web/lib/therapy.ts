@@ -86,13 +86,14 @@ export type Precheck = { ok: true } | { ok: false; reply: string; code: string }
 export function precheck(text: string, userTurns: number): Precheck {
   const t = text.trim();
   if (!t) return { ok: false, code: "empty", reply: "The couch is listening, but you didn't say anything. Tell me what's stressing you out." };
+  // Crisis comes before every other limit: a long or late message about self-harm must still get the helpline.
+  if (isCrisis(t)) return { ok: false, code: "crisis", reply: CRISIS_REPLY };
   if (countWords(t) > MAX_INPUT_WORDS)
     return { ok: false, code: "too_long", reply: `That's a whole novel. Keep it under ${MAX_INPUT_WORDS} words so I can actually help.` };
   if (userTurns > MAX_USER_TURNS)
     return { ok: false, code: "turn_limit", reply: "We've covered a lot. Time to end the session and collect your prescription." };
   if (!/[a-zऀ-ॿ]{2,}/i.test(t))
     return { ok: false, code: "gibberish", reply: "I couldn't make sense of that. Try telling me, in a sentence, what's bothering you." };
-  if (isCrisis(t)) return { ok: false, code: "crisis", reply: CRISIS_REPLY };
   return { ok: true };
 }
 

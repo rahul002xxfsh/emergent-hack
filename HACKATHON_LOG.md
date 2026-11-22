@@ -30,6 +30,12 @@ Every change Claude makes in this folder is recorded here, newest first.
 
 ## Change log
 
+### 2026-11-22 (crisis check now runs before every limit; 12-turn limit fixed)
+- Bug: the crisis check ran after the empty, 250-word, 12-turn and gibberish checks, so a crisis message over 250 words, or sent after 12 turns, got the generic "too long" or "end the session" reply instead of the helpline. The browser also refused to send anything over 250 words.
+- Fix: `web/lib/therapy.ts` checks for crisis right after the empty check. In `web/components/landing.tsx`, a crisis message over 250 words can still be sent: the helpline reply is shown straight away without calling the API, and only the first 250 words are kept in the chat history.
+- Second bug found while testing: `/api/chat` counted turns after keeping only the last 16 messages, so the 12-turn limit never fired. Turns are now counted over the whole session.
+- Verified: build passes; boundary eval 198/198; a 277-word crisis message gets the helpline (API and browser); a 13th-turn crisis message gets the helpline; a 13th-turn normal message gets the turn-limit reply; long normal messages are still blocked.
+
 ### 2026-11-19 (Claude fully removed from the website)
 - Team rule: no Claude / Anthropic API key anywhere, for anything.
 - Removed `web/lib/claude.ts`, the `@anthropic-ai/sdk` package, the Claude code paths in `/api/chat` and `/api/prescription`, the AI system prompts, and `ANTHROPIC_API_KEY` / `CLAUDE_MODEL` from `.env.example`. README updated.

@@ -15,11 +15,12 @@ export async function POST(req: Request) {
   const persona = personas.find((p) => p.id === body.personaId);
   if (!persona) return NextResponse.json({ error: "invalid_request" }, { status: 400 });
 
+  // Count turns over the whole session (before trimming), so the 12-turn limit actually applies.
+  const userTurns = body.messages.filter((m) => m.role === "user").length;
   const messages = body.messages.slice(-16);
   const last = messages[messages.length - 1];
   if (!last || last.role !== "user") return NextResponse.json({ error: "invalid_request" }, { status: 400 });
 
-  const userTurns = messages.filter((m) => m.role === "user").length;
   const check = precheck(last.content, userTurns);
   if (!check.ok) return NextResponse.json({ reply: check.reply, code: check.code, source: "rules" });
 
